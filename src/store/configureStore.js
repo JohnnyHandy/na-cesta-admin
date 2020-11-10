@@ -3,6 +3,7 @@ import createSagaMiddleware from 'redux-saga'
 import { persistStore, persistReducer } from 'redux-persist'
 import { all } from 'redux-saga/effects'
 import { combineReducers } from 'redux'
+import { reducer as formReducer } from 'redux-form'
 import storage from 'redux-persist/lib/storage'
 
 import ProductSagas from './products/sagas'
@@ -22,7 +23,8 @@ export function * rootSaga () {
 }
 
 const rootReducer = combineReducers({
-    products: ProductsReducer
+    products: ProductsReducer,
+    form: formReducer
 })
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 

@@ -10,11 +10,29 @@ export const fetchProducts = () => [
         details: [
             {
                 measure: 'P',
-                colors: ['vermelho', 'verde']
+                colors: [
+                    {
+                        colorId: 'vermelho',
+                        quantity: 10
+                    },
+                    {
+                        colorId: 'verde',
+                        quantity: 15
+                    }        
+                ],
             },
             {
                 measure: 'M',
-                colors: ['azul', 'verde']
+                colors: [
+                    {
+                        colorId: 'azul',
+                        quantity: 5
+                    },
+                    {
+                        colorId: 'verde',
+                        quantity: 15
+                    }        
+                ],
             },
         ],
         price: 20,
@@ -40,18 +58,36 @@ export const fetchProducts = () => [
         model: 'Modelo 2',
         name: 'Maiô teste',
         type: 'maio',
+        quantity: 10,
         description: 'Descrição: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu',
         details: [
             {
                 measure: 'P',
-                colors: ['vermelho', 'verde']
+                colors: [
+                    {
+                        colorId: 'vermelho',
+                        quantity: 10
+                    },
+                    {
+                        colorId: 'verde',
+                        quantity: 15
+                    }        
+                ],
             },
             {
                 measure: 'M',
-                colors: ['azul', 'verde']
+                colors: [
+                    {
+                        colorId: 'azul',
+                        quantity: 5
+                    },
+                    {
+                        colorId: 'verde',
+                        quantity: 15
+                    }        
+                ],
             },
-        ],
-        price: 20,
+        ],        price: 20,
         dealPrice: 15,
         isDeal: true,
         images: [
@@ -74,18 +110,36 @@ export const fetchProducts = () => [
         model: 'Modelo 3',
         name: 'Saida teste',
         type: 'saida',
+        quantity: 10,
         description: 'Descrição: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu',
         details: [
             {
                 measure: 'P',
-                colors: ['vermelho', 'verde']
+                colors: [
+                    {
+                        colorId: 'vermelho',
+                        quantity: 10
+                    },
+                    {
+                        colorId: 'verde',
+                        quantity: 15
+                    }        
+                ],
             },
             {
                 measure: 'M',
-                colors: ['azul', 'verde']
+                colors: [
+                    {
+                        colorId: 'azul',
+                        quantity: 5
+                    },
+                    {
+                        colorId: 'verde',
+                        quantity: 15
+                    }        
+                ],
             },
-        ],
-        price: 20,
+        ],        price: 20,
         dealPrice: 10,
         isDeal: false,
         images: [

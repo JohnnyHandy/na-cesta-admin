@@ -34,23 +34,26 @@ const ListItemComponent = ({data, selected, setSelected}) => data.map(item => (
     </ListGroupItem>
 ))
 
-const List = ({ data, selected, setSelected }) => {
+const List = ({ data, selected, setSelected, setFormMode }) => {
     return (
         <ListContainer>
-        <ListGroup
-            style={{
-                width: '100%'
-            }}
-        >
-            <ListItemComponent
-                data={data}
-                selected={selected}
-                setSelected={setSelected}
-            />
-        </ListGroup>
-        <Button color='primary'>
-            Criar Produto
-        </Button>
+            <ListGroup
+                style={{
+                    width: '100%'
+                }}
+            >
+                <ListItemComponent
+                    data={data}
+                    selected={selected}
+                    setSelected={setSelected}
+                />
+            </ListGroup>
+            <Button
+                color='primary'
+                onClick={() => setFormMode('create')}
+            >
+                Criar Produto
+            </Button>
         </ListContainer>
     )
 }

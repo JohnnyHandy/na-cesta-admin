@@ -20,7 +20,8 @@ const ButtonsContainer = styled('div')`
 `
 
 const ProductDetails = ({
-    product
+    product,
+    setFormMode
 }) => {
     if(!Boolean(product)) {
         return <span> Select a product </span>
@@ -33,7 +34,8 @@ const ProductDetails = ({
         details=[],
         price='',
         dealPrice='',
-        isDeal=false
+        isDeal=false,
+        quantity=''
     } = product
     return (
         <ProductDetailsContainer>
@@ -44,6 +46,7 @@ const ProductDetails = ({
             <MeasureDetails details={details} />
             <DetailsSpan> Preço: ${price} </DetailsSpan>
             <DetailsSpan> Promocional: ${dealPrice} </DetailsSpan>
+            <DetailsSpan>Quantidade: ${quantity}</DetailsSpan>
             <DetailsSpan>Marcar como oferta: {isDeal ? 'Sim' : 'Não'}</DetailsSpan>
             <ButtonsContainer>
                 <Button color='warning'> Editar </Button>
