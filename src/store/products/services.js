@@ -9,7 +9,7 @@ export const fetchProducts = () => [
         description: 'Descrição: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu',
         details: [
             {
-                measure: 'P',
+                size: 'P',
                 colors: [
                     {
                         colorId: 'vermelho',
@@ -22,7 +22,7 @@ export const fetchProducts = () => [
                 ],
             },
             {
-                measure: 'M',
+                size: 'M',
                 colors: [
                     {
                         colorId: 'azul',
@@ -62,7 +62,7 @@ export const fetchProducts = () => [
         description: 'Descrição: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu',
         details: [
             {
-                measure: 'P',
+                size: 'P',
                 colors: [
                     {
                         colorId: 'vermelho',
@@ -75,7 +75,7 @@ export const fetchProducts = () => [
                 ],
             },
             {
-                measure: 'M',
+                size: 'M',
                 colors: [
                     {
                         colorId: 'azul',
@@ -114,7 +114,7 @@ export const fetchProducts = () => [
         description: 'Descrição: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu',
         details: [
             {
-                measure: 'P',
+                size: 'P',
                 colors: [
                     {
                         colorId: 'vermelho',
@@ -127,7 +127,7 @@ export const fetchProducts = () => [
                 ],
             },
             {
-                measure: 'M',
+                size: 'M',
                 colors: [
                     {
                         colorId: 'azul',

@@ -1,5 +1,8 @@
 export const colors = [
     {
+        id: ''
+    },
+    {
         id: 'vermelho',
         hex: '#F70907'
     },
@@ -26,5 +29,15 @@ export const colors = [
     {
         id: 'violeta',
         hex: '#622E8C'
+    },
+    {
+        id: 'branco',
+        hex: '#FFFFFF'
+    },
+    {
+        id: 'preto',
+        hex: '#000000'
     }
 ]
+
+export const sizeOptions = ['','P', 'M', 'G']
