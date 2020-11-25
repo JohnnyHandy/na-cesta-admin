@@ -27,6 +27,7 @@ const ProductDetails = ({
   if (!product) {
     return <span> Select a product </span>;
   }
+  console.log('product', product);
   const {
     name = '',
     images = [],
@@ -82,8 +83,12 @@ const ProductDetails = ({
 };
 
 ProductDetails.propTypes = {
-  product: PropTypes.objectOf().isRequired,
+  product: PropTypes.objectOf(),
   setFormMode: PropTypes.func.isRequired,
+};
+
+ProductDetails.defaultProps = {
+  product: {},
 };
 
 export default ProductDetails;

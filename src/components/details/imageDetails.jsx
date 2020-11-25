@@ -1,58 +1,66 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from '@emotion/styled';
+
+const ImageDetailsContainer = styled('div')`
+  align-items: center;
+  display: flex;
+  flex-direction: column;  
+`;
+const SelectedImage = styled('img')`
+  max-height: 150px;
+  max-width: 150px;
+`;
+const ImageIconsContainer = styled('div')`
+  display: flex;
+  height: 8vh;
+  width: 35vw;
+`;
+
+const ImageIconWrapper = styled('button')`
+  background: white;
+  border: ${(props) => (props.selected ? '2px solid blue' : '')};
+  cursor: pointer;
+  height: 10vh;
+  margin: auto 0.5vw;
+  width: 5vw
+`;
+const ImageIcon = styled('img')`
+  width: 4vw
+`;
 
 const ImageDetails = ({ images }) => {
   const [showImageIndex, setShowImageIndex] = React.useState(0);
   if (!images) {
     return <span> No images available </span>;
   }
+  console.log('images', images);
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <div>
-        <img
-          style={{
-            maxHeight: '150px',
-            maxWidth: '150px',
-          }}
-          src={images[showImageIndex].src}
-          alt={images[showImageIndex].id}
-        />
-      </div>
-      <div
+    <ImageDetailsContainer>
+      <SelectedImage
         style={{
-          display: 'flex',
-          width: '35vw',
-          height: '8vh',
+          maxHeight: '150px',
+          maxWidth: '150px',
         }}
-      >
+        src={images[showImageIndex].src}
+        alt={images[showImageIndex].id}
+      />
+      <ImageIconsContainer>
         {images.map((item, index) => (
-          <button
+          <ImageIconWrapper
             type="button"
-            style={{
-              height: '100%',
-              border: index === showImageIndex ? '2px solid blue' : '',
-              cursor: 'pointer',
-              margin: 'auto 0.5vw',
-              background: 'white',
-            }}
+            selected={index === showImageIndex}
             onClick={() => setShowImageIndex(index)}
             key={item.id}
-
           >
-            <img
+            <ImageIcon
               src={item.src}
               alt={item.id}
             />
-          </button>
+          </ImageIconWrapper>
         ))}
-      </div>
-    </div>
+      </ImageIconsContainer>
+    </ImageDetailsContainer>
   );
 };
 

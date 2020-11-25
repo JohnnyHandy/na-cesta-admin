@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'reactstrap';
 
-import { colors } from '../../utils/constants';
+import { colors as colorOptions } from '../../utils/constants';
 
 const MeasureDetails = ({
   details,
@@ -22,7 +22,7 @@ const MeasureDetails = ({
         {details.map((detail) => (
           <td>
             {detail.colors.map((color) => {
-              const findColor = colors.find((colorItem) => colorItem.id === color);
+              const findColor = colorOptions.find((colorItem) => colorItem.id === color.colorId);
               return (
                 <div style={{
                   backgroundColor: findColor.hex, borderRadius: '50%', width: '15px', height: '15px', margin: 'auto',

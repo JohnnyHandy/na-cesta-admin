@@ -35,14 +35,14 @@ const FormWrapper = styled('div')`
 function App() {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.products);
-  const [selectedProduct, setSelectedProduct] = React.useState();
+  const [selectedProduct, setSelectedProduct] = React.useState('1');
   const [formMode, setFormMode] = React.useState(false);
   React.useEffect(() => {
     dispatch(fetchProductsRequest());
   }, [dispatch]);
 
   const selectedProductDetails = products.items.find((item) => item.id === selectedProduct);
-
+  console.log('selectedProductDetails', selectedProductDetails, 'products', products);
   if (formMode) {
     return (
       <AppContainer>
