@@ -12,7 +12,7 @@ const MeasureDetails = ({
       <tr>
         <th>Medidas </th>
         {details.map((item) => (
-          <th style={{ textAlign: 'center' }}>{item.measure}</th>
+          <th key={item.size} style={{ textAlign: 'center' }}>{item.size}</th>
         ))}
       </tr>
     </thead>
@@ -20,14 +20,24 @@ const MeasureDetails = ({
       <tr>
         <td>Cores</td>
         {details.map((detail) => (
-          <td>
+          <td key={detail.size}>
             {detail.colors.map((color) => {
               const findColor = colorOptions.find((colorItem) => colorItem.id === color.colorId);
               return (
-                <div style={{
-                  backgroundColor: findColor.hex, borderRadius: '50%', width: '15px', height: '15px', margin: 'auto',
-                }}
-                />
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  key={color.colorId}
+                >
+                  <span>{color.quantity}</span>
+                  <div style={{
+                    backgroundColor: findColor.hex, borderRadius: '50%', width: '15px', height: '15px', margin: '0 1vw',
+                  }}
+                  />
+                </div>
               );
             })}
           </td>
@@ -38,7 +48,7 @@ const MeasureDetails = ({
 );
 
 MeasureDetails.propTypes = {
-  details: PropTypes.objectOf().isRequired,
+  details: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default MeasureDetails;

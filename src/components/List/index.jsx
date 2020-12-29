@@ -60,8 +60,8 @@ const List = ({
 );
 
 List.propTypes = {
-  data: PropTypes.arrayOf().isRequired,
-  selected: PropTypes.objectOf().isRequired,
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  selected: PropTypes.string.isRequired,
   setSelected: PropTypes.func.isRequired,
   setFormMode: PropTypes.func.isRequired,
 };

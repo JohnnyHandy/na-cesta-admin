@@ -31,10 +31,9 @@ const ImageIcon = styled('img')`
 
 const ImageDetails = ({ images }) => {
   const [showImageIndex, setShowImageIndex] = React.useState(0);
-  if (!images) {
+  if (!images || !images[showImageIndex]) {
     return <span> No images available </span>;
   }
-  console.log('images', images);
   return (
     <ImageDetailsContainer>
       <SelectedImage
@@ -42,7 +41,7 @@ const ImageDetails = ({ images }) => {
           maxHeight: '150px',
           maxWidth: '150px',
         }}
-        src={images[showImageIndex].src}
+        src={images[showImageIndex].src || images[showImageIndex]}
         alt={images[showImageIndex].id}
       />
       <ImageIconsContainer>
@@ -54,7 +53,7 @@ const ImageDetails = ({ images }) => {
             key={item.id}
           >
             <ImageIcon
-              src={item.src}
+              src={item.src || item}
               alt={item.id}
             />
           </ImageIconWrapper>

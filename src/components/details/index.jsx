@@ -10,9 +10,11 @@ const DetailsSpan = styled('span')`
     align-self: flex-start
 `;
 const ProductDetailsContainer = styled('div')`
+    align-items: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    height: 75vh;
+    justify-content: space-between;
 `;
 const ButtonsContainer = styled('div')`
     display: flex;
@@ -27,7 +29,6 @@ const ProductDetails = ({
   if (!product) {
     return <span> Select a product </span>;
   }
-  console.log('product', product);
   const {
     name = '',
     images = [],
@@ -83,7 +84,9 @@ const ProductDetails = ({
 };
 
 ProductDetails.propTypes = {
-  product: PropTypes.objectOf(),
+  product: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.array, PropTypes.string, PropTypes.number, PropTypes.bool,
+  ])),
   setFormMode: PropTypes.func.isRequired,
 };
 

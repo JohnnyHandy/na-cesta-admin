@@ -12,7 +12,7 @@ const Container = styled('div')`
     background: white;
     height: 90%;
     padding: 2%;
-    width: 40$
+    width: 40vw
 `;
 
 const AppContainer = styled('div')`
@@ -42,7 +42,6 @@ function App() {
   }, [dispatch]);
 
   const selectedProductDetails = products.items.find((item) => item.id === selectedProduct);
-  console.log('selectedProductDetails', selectedProductDetails, 'products', products);
   if (formMode) {
     return (
       <AppContainer>

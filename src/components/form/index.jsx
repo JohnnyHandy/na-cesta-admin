@@ -19,11 +19,11 @@ import {
   TabPane,
 } from 'reactstrap';
 
+import UploadComponent from '../crop/index';
 import { colors, sizeOptions } from '../../utils/constants';
 
 const FormSection = styled('div')`
     display: grid;
-    grid-template-columns: 30% 60%
 `;
 
 const ColorChoiceContainer = styled('div')`
@@ -147,6 +147,7 @@ const renderDetailsForm = ({ fields }) => {
   return (
     <>
       <Button
+        disabled={fields.length >= 3}
         onClick={() => {
           fields.push({
             measure: '',
@@ -190,6 +191,54 @@ const renderDetailsForm = ({ fields }) => {
   );
 };
 
+const ProductDataSection = () => (
+  <>
+    <InputLabel htmlFor="name">Nome</InputLabel>
+    <Field
+      component={TextInput}
+      name="name"
+      placeholder="Nome"
+      id="name"
+    />
+    <InputLabel htmlFor="model">Modelo</InputLabel>
+    <Field
+      component={TextInput}
+      name="model"
+      placeholder="Modelo"
+      id="model"
+    />
+    <InputLabel htmlFor="description">Descrição</InputLabel>
+    <Field
+      component={TextArea}
+      name="description"
+      placeholder="Nome"
+      id="description"
+    />
+    <InputLabel htmlFor="price">Preço</InputLabel>
+    <Field
+      component={TextInput}
+      name="price"
+      placeholder="Preço"
+      id="price"
+    />
+    <InputLabel htmlFor="price">Promocional</InputLabel>
+    <Field
+      component={TextInput}
+      name="price"
+      placeholder="Preço"
+      id="price"
+    />
+    <InputLabel htmlFor="isDeal">Marcar como Oferta</InputLabel>
+    <Field
+      component={Checkbox}
+      name="isDeal"
+      id="isDeal"
+    />
+    <InputLabel htmlFor="details">Detalhes</InputLabel>
+  </>
+
+);
+
 const ProductForm = () => {
   const state = useSelector((getState) => getState);
   const formValues = getFormValues('productsForm')(state);
@@ -200,90 +249,59 @@ const ProductForm = () => {
     <Form
       style={{
         padding: '2vh 1vw',
+        height: '90%',
+        width: '90%',
       }}
     >
       <FormSection>
-        <div>
-          <InputLabel htmlFor="name">Nome</InputLabel>
-          <Field
-            component={TextInput}
-            name="name"
-            placeholder="Nome"
-            id="name"
-          />
-          <InputLabel htmlFor="model">Modelo</InputLabel>
-          <Field
-            component={TextInput}
-            name="model"
-            placeholder="Modelo"
-            id="model"
-          />
-          <InputLabel htmlFor="description">Descrição</InputLabel>
-          <Field
-            component={TextArea}
-            name="description"
-            placeholder="Nome"
-            id="description"
-          />
-          <InputLabel htmlFor="price">Preço</InputLabel>
-          <Field
-            component={TextInput}
-            name="price"
-            placeholder="Preço"
-            id="price"
-          />
-          <InputLabel htmlFor="price">Promocional</InputLabel>
-          <Field
-            component={TextInput}
-            name="price"
-            placeholder="Preço"
-            id="price"
-          />
-          <InputLabel htmlFor="isDeal">Marcar como Oferta</InputLabel>
-          <Field
-            component={Checkbox}
-            name="isDeal"
-            id="isDeal"
-          />
-          <InputLabel htmlFor="details">Detalhes</InputLabel>
-        </div>
-        <div>
-          <Nav tabs>
-            <NavItem>
-              <StyledNavLink
-                onClick={() => toggleTab('1')}
-                selected={activeTab === '1'}
-              >
-                Detalhes
-              </StyledNavLink>
-            </NavItem>
-            <NavItem>
-              <StyledNavLink
-                selected={activeTab === '2'}
-                onClick={() => toggleTab('2')}
-              >
-                Fotos
-              </StyledNavLink>
-            </NavItem>
-          </Nav>
-          <TabContent activeTab={activeTab}>
-            <StyledTabPane
-              tabId="1"
+        <Nav
+          tabs
+        >
+          <NavItem>
+            <StyledNavLink
+              onClick={() => toggleTab('1')}
+              selected={activeTab === '1'}
             >
-              <FieldArray
-                name="details"
-                component={renderDetailsForm}
-                value={detailsFormValue}
-              />
-            </StyledTabPane>
-            <StyledTabPane
-              tabId="2"
+              Dados do produto
+            </StyledNavLink>
+          </NavItem>
+          <NavItem>
+            <StyledNavLink
+              onClick={() => toggleTab('2')}
+              selected={activeTab === '2'}
             >
-              Selecione as imagens
-            </StyledTabPane>
-          </TabContent>
-
-        </div>
+              Tamanho e cores
+            </StyledNavLink>
+          </NavItem>
+          <NavItem>
+            <StyledNavLink
+              selected={activeTab === '3'}
+              onClick={() => toggleTab('3')}
+            >
+              Fotos
+            </StyledNavLink>
+          </NavItem>
+        </Nav>
+        <TabContent activeTab={activeTab}>
+          <StyledTabPane tabId="1">
+            <ProductDataSection />
+          </StyledTabPane>
+          <StyledTabPane
+            tabId="2"
+          >
+            <FieldArray
+              name="details"
+              component={renderDetailsForm}
+              value={detailsFormValue}
+            />
+          </StyledTabPane>
+          <StyledTabPane
+            tabId="3"
+          >
+            Selecione as imagens
+            <UploadComponent />
+          </StyledTabPane>
+        </TabContent>
       </FormSection>
     </Form>
   );
