@@ -243,6 +243,9 @@ const ProductForm = () => {
   const state = useSelector((getState) => getState);
   const formValues = getFormValues('productsForm')(state);
   const detailsFormValue = formValues && formValues.details;
+  const imagesValue = formValues && formValues.images;
+  console.log('formvalues', formValues, 'imageValue', imagesValue);
+
   const [activeTab, toggleTab] = React.useState('1');
 
   return (
@@ -299,7 +302,12 @@ const ProductForm = () => {
             tabId="3"
           >
             Selecione as imagens
-            <UploadComponent />
+            <FieldArray
+              name="images"
+              component={UploadComponent}
+              values={imagesValue}
+              formValues={formValues}
+            />
           </StyledTabPane>
         </TabContent>
       </FormSection>
@@ -308,11 +316,14 @@ const ProductForm = () => {
 };
 
 TextInput.propTypes = {
-  input: PropTypes.objectOf().isRequired,
+  input: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.string,
+  ])).isRequired,
 };
 
 RenderSelectInput.propTypes = {
-  input: PropTypes.objectOf().isRequired,
+  input: PropTypes.objectOf(PropTypes.object).isRequired,
   options: PropTypes.arrayOf().isRequired,
   disabledOptions: PropTypes.arrayOf().isRequired,
 };

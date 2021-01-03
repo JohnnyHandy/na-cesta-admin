@@ -1,4 +1,6 @@
 /* eslint-disable import/prefer-default-export */
+import axios from 'axios';
+
 export const fetchProducts = () => [
   {
     id: '1',
@@ -159,3 +161,31 @@ export const fetchProducts = () => [
     ],
   },
 ];
+
+export const getPreSignedUrl = ({ objectKey, type }) => {
+  const options = {
+    method: 'POST',
+    url: 'https://lhpx7am1gk.execute-api.sa-east-1.amazonaws.com/dev/upload',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'allow',
+    },
+    data: {
+      object_key: objectKey,
+      type,
+    },
+  };
+  return axios(options);
+};
+
+export const uploadImageWithSignedUrl = ({ url, data, type }) => {
+  const options = {
+    method: 'PUT',
+    url,
+    headers: {
+      'Content-Type': type,
+    },
+    data,
+  };
+  return axios(options);
+};

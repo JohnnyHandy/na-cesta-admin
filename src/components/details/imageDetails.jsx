@@ -13,7 +13,7 @@ const SelectedImage = styled('img')`
 `;
 const ImageIconsContainer = styled('div')`
   display: flex;
-  height: 8vh;
+  height: 15vh;
   width: 35vw;
 `;
 
@@ -41,7 +41,7 @@ const ImageDetails = ({ images }) => {
           maxHeight: '150px',
           maxWidth: '150px',
         }}
-        src={images[showImageIndex].src || images[showImageIndex]}
+        src={images[showImageIndex].src || images[showImageIndex].url}
         alt={images[showImageIndex].id}
       />
       <ImageIconsContainer>
@@ -53,7 +53,7 @@ const ImageDetails = ({ images }) => {
             key={item.id}
           >
             <ImageIcon
-              src={item.src || item}
+              src={item.src || item.url || item}
               alt={item.id}
             />
           </ImageIconWrapper>

@@ -12,6 +12,7 @@ import { ProductsReducer } from './products/index';
 const persistConfig = {
   key: 'root',
   storage,
+  blacklist: ['form'],
 };
 
 const sagaMiddleware = createSagaMiddleware();

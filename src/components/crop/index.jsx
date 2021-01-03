@@ -1,12 +1,17 @@
+/* eslint-disable no-unused-vars */
 import React, {
   useState, useCallback, useRef, useEffect,
 } from 'react';
+import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone-uploader';
 import ReactCrop from 'react-image-crop';
+import { Button } from 'reactstrap';
+import { useDispatch } from 'react-redux';
 import 'react-dropzone-uploader/dist/styles.css';
 import 'react-image-crop/dist/ReactCrop.css';
 
 import ImageDetails from '../details/imageDetails';
+import { uploadImageRequest } from '../../store/products';
 
 // Increase pixel density for crop preview quality on retina screens.
 const pixelRatio = window.devicePixelRatio || 1;
@@ -34,40 +39,21 @@ function getResizedCanvas(canvas, newWidth, newHeight) {
   return tmpCanvas;
 }
 
-// function generateDownload(previewCanvas, crop) {
-//   if (!crop || !previewCanvas) {
-//     return;
-//   }
-
-//   const canvas = getResizedCanvas(previewCanvas, crop.width, crop.height);
-
-//   canvas.toBlob(
-//     (blob) => {
-//       const previewUrl = window.URL.createObjectURL(blob);
-
-//       const anchor = document.createElement('a');
-//       anchor.download = 'cropPreview.png';
-//       anchor.href = URL.createObjectURL(blob);
-//       anchor.click();
-
-//       window.URL.revokeObjectURL(previewUrl);
-//     },
-//     'image/png',
-//     1,
-//   );
-// }
-
-export default function App() {
-  const [fileList, setFileList] = useState([]);
+export default function UploadCrop(props) {
+  const { fields, values } = props;
+  const dispatch = useDispatch();
+  // const [fileList, setFileList] = useState([]);
   const [upImg, setUpImg] = useState();
   const imgRef = useRef(null);
   const previewCanvasRef = useRef(null);
   const [crop, setCrop] = useState({ unit: '%', width: 30, aspect: 1 / 1 });
   const [completedCrop, setCompletedCrop] = useState(null);
-
   const onSelectFile = (file) => {
     const reader = new FileReader();
-    reader.addEventListener('load', () => setUpImg(reader.result));
+    reader.addEventListener('load', () => setUpImg({
+      result: reader.result,
+      info: file,
+    }));
     reader.readAsDataURL(file);
   };
   function generateDownload(previewCanvas, getCrop) {
@@ -79,19 +65,15 @@ export default function App() {
 
     canvas.toBlob(
       (blob) => {
-        const previewUrl = window.URL.createObjectURL(blob);
-        setFileList(fileList.concat(previewUrl));
+        const imageFile = new File([blob], upImg.name);
+        dispatch(uploadImageRequest({
+          info: upImg.info,
+          file: imageFile,
+          fields,
+        }));
         setCompletedCrop(null);
         setUpImg();
-
-        // const anchor = document.createElement('a');
-        // anchor.download = 'cropPreview.png';
-        // anchor.href = URL.createObjectURL(blob);
-        // anchor.click();
-
-        // window.URL.revokeObjectURL(previewUrl);
       },
-
       'image/png',
       1,
     );
@@ -102,15 +84,9 @@ export default function App() {
   }, []);
   // called every time a file's `status` changes
   const handleChangeStatus = ({ meta, file }, status) => {
-    console.log(status, meta, file);
+    // console.log(status, meta, file);
     onSelectFile(file);
   };
-
-  // receives array of files that are done uploading when submit button is clicked
-  // const handleSubmit = (files, allFiles) => {
-  //   console.log(files.map(f => f.meta))
-  //   allFiles.forEach(f => f.remove())
-  // }
 
   useEffect(() => {
     if (!completedCrop || !previewCanvasRef.current || !imgRef.current) {
@@ -143,24 +119,61 @@ export default function App() {
       actualCrop.height,
     );
   }, [completedCrop]);
-
   return (
-    <div className="App">
-      <ImageDetails images={fileList} />
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    }}
+    >
+      <ImageDetails images={values.map((item) => ({
+        src: `https://${process.env.REACT_APP_S3_BUCKET}.s3-${process.env.REACT_APP_REGION}.amazonaws.com/${item.key}`,
+      }))}
+      />
       <div>
         <Dropzone
           PreviewComponent={null}
           accept="image/*"
           autoUpload={false}
           onChangeStatus={handleChangeStatus}
+          inputContent="Arraste a foto para essa área ou clique para adicionar foto"
+          inputWithFilesContent="Arraste a foto para essa área ou clique para adicionar foto"
+          styles={{
+            inputLabelWithFiles: {
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'absolute',
+              top: '0',
+              bottom: '0',
+              left: '0',
+              right: '0',
+              fontFamily: 'Helvetica, sans-serif',
+              fontSize: '20px',
+              fontWeight: '600',
+              color: '#2484FF',
+              MozOsxFontSmoothing: 'grayscale',
+              WebkitFontSmoothing: 'antialiased',
+              cursor: 'pointer',
+            },
+            dropzone: {
+              width: '50vw',
+            },
+          }}
         />
       </div>
       <ReactCrop
-        src={upImg}
+        src={upImg && upImg.result}
         onImageLoaded={onLoad}
         crop={crop}
         onChange={(c) => setCrop(c)}
         onComplete={(c) => setCompletedCrop(c)}
+        style={{
+          margin: '1vh 1vw',
+        }}
+        imageStyle={{
+          maxHeight: '50vh',
+        }}
       />
       <div>
         <canvas
@@ -176,13 +189,47 @@ export default function App() {
         {/* Note that the download below won't work in this sandbox due to the
         iframe missing 'allow-downloads'. It's just for your reference. */}
       </p>
-      <button
-        type="button"
-        disabled={!completedCrop?.width || !completedCrop?.height}
-        onClick={() => generateDownload(previewCanvasRef.current, completedCrop)}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          width: '25vw',
+        }}
       >
-        Download cropped image
-      </button>
+        <Button
+          type="button"
+          disabled={!completedCrop?.width || !completedCrop?.height}
+          onClick={() => generateDownload(previewCanvasRef.current, completedCrop)}
+        >
+          Confirmar
+        </Button>
+        <Button
+          type="button"
+          color="warning"
+          disabled={!completedCrop?.width || !completedCrop?.height}
+          onClick={() => {
+            setCompletedCrop(null);
+            setUpImg();
+          }}
+        >
+          Cancelar
+        </Button>
+
+      </div>
     </div>
   );
 }
+
+UploadCrop.propTypes = {
+  fields: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.bool,
+    PropTypes.number,
+    PropTypes.string,
+  ])).isRequired,
+  values: PropTypes.arrayOf(PropTypes.object),
+};
+
+UploadCrop.defaultProps = {
+  values: [],
+};
