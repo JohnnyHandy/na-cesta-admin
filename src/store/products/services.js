@@ -162,17 +162,16 @@ export const fetchProducts = () => [
   },
 ];
 
-export const getPreSignedUrl = ({ objectKey, type }) => {
+export const lambdaS3Service = ({ method, ...params }) => {
   const options = {
-    method: 'POST',
+    method,
     url: 'https://lhpx7am1gk.execute-api.sa-east-1.amazonaws.com/dev/upload',
     headers: {
       'Content-Type': 'application/json',
       Authorization: 'allow',
     },
     data: {
-      object_key: objectKey,
-      type,
+      ...params,
     },
   };
   return axios(options);

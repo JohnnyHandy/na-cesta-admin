@@ -7,19 +7,15 @@ import ImageDetails from './imageDetails';
 import MeasureDetails from './measuresDetails';
 
 const DetailsSpan = styled('span')`
-    align-self: flex-start
-`;
-const ProductDetailsContainer = styled('div')`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    height: 75vh;
-    justify-content: space-between;
+    align-self: flex-start;
+    font-size: 1vw;
 `;
 const ButtonsContainer = styled('div')`
     display: flex;
+
+    justify-content: space-around;
+    position: absolute;
     width: 100%;
-    justify-content: space-around
 `;
 
 const ProductDetails = ({
@@ -41,7 +37,7 @@ const ProductDetails = ({
     quantity = '',
   } = product;
   return (
-    <ProductDetailsContainer>
+    <>
       <span>
         {' '}
         {name}
@@ -79,7 +75,7 @@ const ProductDetails = ({
         <Button onClick={() => setFormMode()} color="warning"> Editar </Button>
         <Button color="danger"> Deletar </Button>
       </ButtonsContainer>
-    </ProductDetailsContainer>
+    </>
   );
 };
 

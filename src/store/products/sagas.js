@@ -17,7 +17,13 @@ export function* uploadImageToS3({ payload }) {
   const { info, file, fields } = payload;
   try {
     const objectKey = `images/${info.name}`;
-    const getUrlResponse = yield call(services.getPreSignedUrl, { objectKey, type: info.type });
+    const params = {
+      object_key: objectKey,
+      type: info.type,
+      action: 'getSignedUrl',
+      method: 'POST',
+    };
+    const getUrlResponse = yield call(services.lambdaS3Service, params);
     const preSignedUrl = getUrlResponse.data.url;
     const uploadImageResponse = yield call(
       services.uploadImageWithSignedUrl, { url: preSignedUrl, data: file, type: info.type },
@@ -30,6 +36,23 @@ export function* uploadImageToS3({ payload }) {
   }
 }
 
+export function* deleteS3Image({ payload }) {
+  const { objectKey, fields, index } = payload;
+  try {
+    const params = {
+      object_key: objectKey,
+      action: 'deleteObject',
+      method: 'DELETE',
+    };
+    const response = yield call(services.lambdaS3Service, params);
+    console.log('response', response);
+    fields.remove(index);
+    yield put(actions.deleteImageSuccess());
+  } catch (error) {
+    yield put(actions.deleteImageFailure());
+  }
+}
+
 export function* watchFetchProducts() {
   yield takeLatest(actions.fetchProductsRequest, fetchProducts);
 }
@@ -38,9 +61,14 @@ export function* watchUploadImageToS3() {
   yield takeLatest(actions.uploadImageRequest, uploadImageToS3);
 }
 
+export function* watchDeleteImage() {
+  yield takeLatest(actions.deleteImageRequest, deleteS3Image);
+}
+
 export default function* ProductsSaga() {
   yield all([
     watchFetchProducts(),
     watchUploadImageToS3(),
+    watchDeleteImage(),
   ]);
 }

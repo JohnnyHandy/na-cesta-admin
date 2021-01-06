@@ -9,13 +9,27 @@ import ProductDetails from './components/details';
 import { fetchProductsRequest } from './store/products';
 
 const Container = styled('div')`
+    align-items: center;
+    display: flex;
     background: white;
+    flex-direction: column;
     height: 90%;
+    justify-content: space-between;
     padding: 2%;
-    width: 40vw
 `;
 
 const AppContainer = styled('div')`
+  align-items: center;
+  background-color: burlywood;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 25% 65%;
+  justify-content: space-around;
+  padding: 2vh 2vw;
+  position: relative
+`;
+
+const FormExternalWrapper = styled('div')`
   align-items: center;
   background-color: burlywood;
   height: 100vh;
@@ -24,7 +38,6 @@ const AppContainer = styled('div')`
   padding: 2vh 2vw;
   position: relative
 `;
-
 const FormWrapper = styled('div')`
     width: 80%;
     height: 90%;
@@ -44,7 +57,7 @@ function App() {
   const selectedProductDetails = products.items.find((item) => item.id === selectedProduct);
   if (formMode) {
     return (
-      <AppContainer>
+      <FormExternalWrapper>
         <FormWrapper>
           <Button
             close
@@ -53,7 +66,7 @@ function App() {
           />
           <FormContainer />
         </FormWrapper>
-      </AppContainer>
+      </FormExternalWrapper>
     );
   }
   return (

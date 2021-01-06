@@ -241,10 +241,10 @@ const ProductDataSection = () => (
 
 const ProductForm = () => {
   const state = useSelector((getState) => getState);
+  const productsState = state.products;
   const formValues = getFormValues('productsForm')(state);
   const detailsFormValue = formValues && formValues.details;
   const imagesValue = formValues && formValues.images;
-  console.log('formvalues', formValues, 'imageValue', imagesValue);
 
   const [activeTab, toggleTab] = React.useState('1');
 
@@ -303,6 +303,7 @@ const ProductForm = () => {
           >
             Selecione as imagens
             <FieldArray
+              productsState={productsState}
               name="images"
               component={UploadComponent}
               values={imagesValue}

@@ -11,7 +11,7 @@ import 'react-dropzone-uploader/dist/styles.css';
 import 'react-image-crop/dist/ReactCrop.css';
 
 import ImageDetails from '../details/imageDetails';
-import { uploadImageRequest } from '../../store/products';
+import { uploadImageRequest, deleteImageRequest } from '../../store/products';
 
 // Increase pixel density for crop preview quality on retina screens.
 const pixelRatio = window.devicePixelRatio || 1;
@@ -40,9 +40,8 @@ function getResizedCanvas(canvas, newWidth, newHeight) {
 }
 
 export default function UploadCrop(props) {
-  const { fields, values } = props;
+  const { fields, values, productsState } = props;
   const dispatch = useDispatch();
-  // const [fileList, setFileList] = useState([]);
   const [upImg, setUpImg] = useState();
   const imgRef = useRef(null);
   const previewCanvasRef = useRef(null);
@@ -119,6 +118,11 @@ export default function UploadCrop(props) {
       actualCrop.height,
     );
   }, [completedCrop]);
+
+  const deleteImage = (params) => dispatch(deleteImageRequest({
+    ...params,
+    fields,
+  }));
   return (
     <div style={{
       display: 'flex',
@@ -126,9 +130,14 @@ export default function UploadCrop(props) {
       alignItems: 'center',
     }}
     >
-      <ImageDetails images={values.map((item) => ({
-        src: `https://${process.env.REACT_APP_S3_BUCKET}.s3-${process.env.REACT_APP_REGION}.amazonaws.com/${item.key}`,
-      }))}
+      <ImageDetails
+        controls
+        deleteImage={deleteImage}
+        loading={productsState.isFetching}
+        images={values.map((item) => ({
+          src: `https://${process.env.REACT_APP_S3_BUCKET}.s3-${process.env.REACT_APP_REGION}.amazonaws.com/${item.key}`,
+          objectKey: item.key,
+        }))}
       />
       <div>
         <Dropzone
@@ -228,8 +237,16 @@ UploadCrop.propTypes = {
     PropTypes.string,
   ])).isRequired,
   values: PropTypes.arrayOf(PropTypes.object),
+  isFetching: PropTypes.bool,
+  productsState: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.bool,
+  ])),
 };
 
 UploadCrop.defaultProps = {
   values: [],
+  isFetching: false,
+  productsState: {
+    isFetching: false,
+  },
 };

@@ -1,6 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
+import { Button } from 'reactstrap';
+import { AiOutlineCloseSquare } from 'react-icons/ai';
+import { CgArrowLeftR, CgArrowRightR } from 'react-icons/cg';
+
+import Loading from '../loading';
 
 const ImageDetailsContainer = styled('div')`
   align-items: center;
@@ -16,6 +21,17 @@ const ImageIconsContainer = styled('div')`
   height: 15vh;
   width: 35vw;
 `;
+const ImageIconContainer = styled('div')`
+    display: flex;
+    flex-direction: column;
+    margin: 1vh 1vw;  
+`;
+
+const ImageIconControls = styled('div')`
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+`;
 
 const ImageIconWrapper = styled('button')`
   background: white;
@@ -29,8 +45,13 @@ const ImageIcon = styled('img')`
   width: 4vw
 `;
 
-const ImageDetails = ({ images }) => {
+const ImageDetails = ({
+  images, controls, deleteImage, loading,
+}) => {
   const [showImageIndex, setShowImageIndex] = React.useState(0);
+  if (loading) {
+    return <Loading />;
+  }
   if (!images || !images[showImageIndex]) {
     return <span> No images available </span>;
   }
@@ -40,23 +61,52 @@ const ImageDetails = ({ images }) => {
         style={{
           maxHeight: '150px',
           maxWidth: '150px',
+          margin: '1vh 1vw',
         }}
         src={images[showImageIndex].src || images[showImageIndex].url}
         alt={images[showImageIndex].id}
       />
+      {
+        controls && (
+        <Button
+          size="sm"
+          color="danger"
+          onClick={() => deleteImage({
+            objectKey: images[showImageIndex].objectKey,
+            index: showImageIndex,
+          })}
+        >
+          Excluir
+          {' '}
+          <AiOutlineCloseSquare />
+        </Button>
+        )
+
+      }
       <ImageIconsContainer>
         {images.map((item, index) => (
-          <ImageIconWrapper
-            type="button"
-            selected={index === showImageIndex}
-            onClick={() => setShowImageIndex(index)}
-            key={item.id}
-          >
-            <ImageIcon
-              src={item.src || item.url || item}
-              alt={item.id}
-            />
-          </ImageIconWrapper>
+          <ImageIconContainer>
+            <ImageIconWrapper
+              type="button"
+              selected={index === showImageIndex}
+              onClick={() => setShowImageIndex(index)}
+              key={item.id}
+            >
+              <ImageIcon
+                src={item.src || item.url || item}
+                alt={item.id}
+              />
+            </ImageIconWrapper>
+            {
+              controls && (
+              <ImageIconControls>
+                <CgArrowLeftR style={{ cursor: 'pointer' }} />
+                <CgArrowRightR style={{ cursor: 'pointer' }} />
+              </ImageIconControls>
+              )
+
+            }
+          </ImageIconContainer>
         ))}
       </ImageIconsContainer>
     </ImageDetailsContainer>
@@ -65,6 +115,15 @@ const ImageDetails = ({ images }) => {
 
 ImageDetails.propTypes = {
   images: PropTypes.arrayOf(PropTypes.object).isRequired,
+  controls: PropTypes.bool,
+  deleteImage: PropTypes.func,
+  loading: PropTypes.bool,
+};
+
+ImageDetails.defaultProps = {
+  controls: false,
+  deleteImage: () => {},
+  loading: false,
 };
 
 export default ImageDetails;
