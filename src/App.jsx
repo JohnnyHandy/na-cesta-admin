@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 import List from './components/List';
 import FormContainer from './container/form';
 import ProductDetails from './components/details';
-import { fetchProductsRequest } from './store/products';
+// import { fetchProductsRequest } from './store/products';
 
 const Container = styled('div')`
     align-items: center;
@@ -51,7 +51,7 @@ function App() {
   const [selectedProduct, setSelectedProduct] = React.useState('1');
   const [formMode, setFormMode] = React.useState(false);
   React.useEffect(() => {
-    dispatch(fetchProductsRequest());
+    // dispatch(fetchProductsRequest());
   }, [dispatch]);
 
   const selectedProductDetails = products.items.find((item) => item.id === selectedProduct);
@@ -64,7 +64,7 @@ function App() {
             color="danger"
             onClick={() => setFormMode(false)}
           />
-          <FormContainer />
+          <FormContainer dispatch={dispatch} />
         </FormWrapper>
       </FormExternalWrapper>
     );

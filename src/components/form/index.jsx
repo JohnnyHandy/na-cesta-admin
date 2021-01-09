@@ -21,6 +21,7 @@ import {
 
 import UploadComponent from '../crop/index';
 import { colors, sizeOptions } from '../../utils/constants';
+// import { createProductRequest } from '../../store/products';
 
 const FormSection = styled('div')`
     display: grid;
@@ -57,10 +58,11 @@ const Input = styled('input')`
 const TextInput = ({ input }) => (
   <Input {...input} size="sm" type="text" />
 );
-const Checkbox = (props) => <Input {...props} type="checkbox" />;
+const Checkbox = ({ input }) => <Input {...input} type="checkbox" />;
 
 const TextArea = styled('textarea')`
 `;
+const TextAreaInput = ({ input }) => <TextArea {...input} />;
 
 const InputLabel = styled(Label)`
     display: block
@@ -75,7 +77,7 @@ const RenderSelectInput = ({
   >
     {options.map((item) => (
       <option
-        disabled={disabledOptions.includes(item)}
+        disabled={disabledOptions && disabledOptions.includes(item)}
         key={item}
         value={item}
       >
@@ -84,6 +86,7 @@ const RenderSelectInput = ({
     ))}
   </Select>
 );
+
 const renderColorsForm = ({ fields }) => {
   const value = fields.getAll();
   const getColors = value && value.map(((item) => item.colorId));
@@ -207,9 +210,20 @@ const ProductDataSection = () => (
       placeholder="Modelo"
       id="model"
     />
+    <InputLabel htmlFor="type"> Tipo </InputLabel>
+    <Field
+      component={RenderSelectInput}
+      name="type"
+      id="type"
+      options={[
+        'biquini',
+        'saida',
+        'maiô',
+      ]}
+    />
     <InputLabel htmlFor="description">Descrição</InputLabel>
     <Field
-      component={TextArea}
+      component={TextAreaInput}
       name="description"
       placeholder="Nome"
       id="description"
@@ -221,12 +235,12 @@ const ProductDataSection = () => (
       placeholder="Preço"
       id="price"
     />
-    <InputLabel htmlFor="price">Promocional</InputLabel>
+    <InputLabel htmlFor="dealPrice">Promocional</InputLabel>
     <Field
       component={TextInput}
-      name="price"
+      name="dealPrice"
       placeholder="Preço"
-      id="price"
+      id="dealPrice"
     />
     <InputLabel htmlFor="isDeal">Marcar como Oferta</InputLabel>
     <Field
@@ -234,12 +248,12 @@ const ProductDataSection = () => (
       name="isDeal"
       id="isDeal"
     />
-    <InputLabel htmlFor="details">Detalhes</InputLabel>
   </>
 
 );
 
-const ProductForm = () => {
+const ProductForm = (props) => {
+  const { handleSubmit } = props;
   const state = useSelector((getState) => getState);
   const productsState = state.products;
   const formValues = getFormValues('productsForm')(state);
@@ -247,7 +261,6 @@ const ProductForm = () => {
   const imagesValue = formValues && formValues.images;
 
   const [activeTab, toggleTab] = React.useState('1');
-
   return (
     <Form
       style={{
@@ -255,6 +268,7 @@ const ProductForm = () => {
         height: '90%',
         width: '90%',
       }}
+      onSubmit={handleSubmit}
     >
       <FormSection>
         <Nav
@@ -285,6 +299,11 @@ const ProductForm = () => {
             </StyledNavLink>
           </NavItem>
         </Nav>
+        <Button
+          type="submit"
+        >
+          Salvar Produto
+        </Button>
         <TabContent activeTab={activeTab}>
           <StyledTabPane tabId="1">
             <ProductDataSection />
@@ -324,9 +343,33 @@ TextInput.propTypes = {
 };
 
 RenderSelectInput.propTypes = {
-  input: PropTypes.objectOf(PropTypes.object).isRequired,
-  options: PropTypes.arrayOf().isRequired,
-  disabledOptions: PropTypes.arrayOf().isRequired,
+  input: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+    PropTypes.func,
+  ])).isRequired,
+  options: PropTypes.arrayOf(PropTypes.string).isRequired,
+  disabledOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
+
+Checkbox.propTypes = {
+  input: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+    PropTypes.func,
+  ])).isRequired,
+};
+
+ProductForm.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
+};
+
+TextAreaInput.propTypes = {
+  input: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+    PropTypes.func,
+  ])).isRequired,
 };
 
 export default reduxForm({ form: 'productsForm' })(ProductForm);

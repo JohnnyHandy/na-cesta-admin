@@ -43,7 +43,12 @@ const ProductDetails = ({
         {name}
         {' '}
       </span>
-      <ImageDetails images={images} />
+      <ImageDetails
+        images={images.map((item) => ({
+          src: `https://${process.env.REACT_APP_S3_BUCKET}.s3-${process.env.REACT_APP_REGION}.amazonaws.com/${item.key}`,
+          objectKey: item.key,
+        }))}
+      />
       <DetailsSpan>
         Tipo:
         {type}

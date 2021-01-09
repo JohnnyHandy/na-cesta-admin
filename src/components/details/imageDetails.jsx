@@ -85,12 +85,13 @@ const ImageDetails = ({
       }
       <ImageIconsContainer>
         {images.map((item, index) => (
-          <ImageIconContainer>
+          <ImageIconContainer
+            key={item.id || item.objectKey || item.key}
+          >
             <ImageIconWrapper
               type="button"
               selected={index === showImageIndex}
               onClick={() => setShowImageIndex(index)}
-              key={item.id}
             >
               <ImageIcon
                 src={item.src || item.url || item}

@@ -1,6 +1,7 @@
 import {
-  put, call, takeLatest, all,
+  put, call, takeLatest, all, select,
 } from 'redux-saga/effects';
+import { generateId } from '../../utils/functions';
 import * as actions from '.';
 import * as services from './services';
 
@@ -16,7 +17,8 @@ export function* fetchProducts() {
 export function* uploadImageToS3({ payload }) {
   const { info, file, fields } = payload;
   try {
-    const objectKey = `images/${info.name}`;
+    const newId = generateId(9);
+    const objectKey = `images/${newId}${info.name}`;
     const params = {
       object_key: objectKey,
       type: info.type,
@@ -45,11 +47,23 @@ export function* deleteS3Image({ payload }) {
       method: 'DELETE',
     };
     const response = yield call(services.lambdaS3Service, params);
-    console.log('response', response);
-    fields.remove(index);
-    yield put(actions.deleteImageSuccess());
+    if (response.statusText === 'OK') {
+      fields.remove(index);
+      yield put(actions.deleteImageSuccess());
+    }
   } catch (error) {
     yield put(actions.deleteImageFailure());
+  }
+}
+
+export function* createProduct({ payload }) {
+  try {
+    const id = generateId(5);
+    const productItems = yield select((state) => state.products.items);
+    const newArray = productItems.concat({ ...payload, id });
+    yield put(actions.createProductSuccess(newArray));
+  } catch (error) {
+    yield put(actions.createProductFailure());
   }
 }
 
@@ -65,10 +79,15 @@ export function* watchDeleteImage() {
   yield takeLatest(actions.deleteImageRequest, deleteS3Image);
 }
 
+export function* watchCreateProduct() {
+  yield takeLatest(actions.createProductRequest, createProduct);
+}
+
 export default function* ProductsSaga() {
   yield all([
     watchFetchProducts(),
     watchUploadImageToS3(),
     watchDeleteImage(),
+    watchCreateProduct(),
   ]);
 }

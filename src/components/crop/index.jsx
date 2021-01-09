@@ -240,6 +240,8 @@ UploadCrop.propTypes = {
   isFetching: PropTypes.bool,
   productsState: PropTypes.objectOf(PropTypes.oneOfType([
     PropTypes.bool,
+    PropTypes.array,
+    PropTypes.object,
   ])),
 };
 
@@ -248,5 +250,7 @@ UploadCrop.defaultProps = {
   isFetching: false,
   productsState: {
     isFetching: false,
+    items: [],
+    images: {},
   },
 };

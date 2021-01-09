@@ -12,6 +12,10 @@ export const deleteImageRequest = createAction('Products/DELETE_IMAGE_REQUEST');
 export const deleteImageSuccess = createAction('Products/DELETE_IMAGE_SUCCESS');
 export const deleteImageFailure = createAction('Products/DELETE_IMAGE_FAILURE');
 
+export const createProductRequest = createAction('Products/CREATE_PRODUCT_REQUEST');
+export const createProductSuccess = createAction('Products/CREATE_PRODUCT_SUCCESS');
+export const createProductFailure = createAction('Products/CREATE_PRODUCT_FAILURE');
+
 export const initialState = {
   items: [],
   isFetching: false,
@@ -82,5 +86,20 @@ export const ProductsReducer = createReducer(initialState, {
       isFetching: false,
       error: action.payload,
     },
+  }),
+  [createProductRequest]: (state) => ({
+    ...state,
+    isFetching: true,
+    error: null,
+  }),
+  [createProductSuccess]: (state, action) => ({
+    ...state,
+    isFetching: false,
+    items: action.payload,
+  }),
+  [createProductFailure]: (state, action) => ({
+    ...state,
+    isFetching: false,
+    error: action.payload,
   }),
 });
