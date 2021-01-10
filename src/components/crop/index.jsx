@@ -138,6 +138,7 @@ export default function UploadCrop(props) {
           src: `https://${process.env.REACT_APP_S3_BUCKET}.s3-${process.env.REACT_APP_REGION}.amazonaws.com/${item.key}`,
           objectKey: item.key,
         }))}
+        fields={fields}
       />
       <div>
         <Dropzone

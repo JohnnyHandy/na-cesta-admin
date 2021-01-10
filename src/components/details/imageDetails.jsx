@@ -46,14 +46,15 @@ const ImageIcon = styled('img')`
 `;
 
 const ImageDetails = ({
-  images, controls, deleteImage, loading,
+  images, controls, deleteImage, loading, fields,
 }) => {
   const [showImageIndex, setShowImageIndex] = React.useState(0);
+  console.log('fields', fields);
   if (loading) {
     return <Loading />;
   }
   if (!images || !images[showImageIndex]) {
-    return <span> No images available </span>;
+    return <span> Sem imagens adicionadas </span>;
   }
   return (
     <ImageDetailsContainer>
@@ -84,7 +85,7 @@ const ImageDetails = ({
 
       }
       <ImageIconsContainer>
-        {images.map((item, index) => (
+        {images.map((item, index, self) => (
           <ImageIconContainer
             key={item.id || item.objectKey || item.key}
           >
@@ -101,8 +102,14 @@ const ImageDetails = ({
             {
               controls && (
               <ImageIconControls>
-                <CgArrowLeftR style={{ cursor: 'pointer' }} />
-                <CgArrowRightR style={{ cursor: 'pointer' }} />
+                <CgArrowLeftR
+                  style={{ cursor: 'pointer', display: index === 0 && 'none' }}
+                  onClick={() => fields.move(index, index - 1)}
+                />
+                <CgArrowRightR
+                  style={{ cursor: 'pointer', display: self.length === index + 1 && 'none' }}
+                  onClick={() => fields.move(index, index + 1)}
+                />
               </ImageIconControls>
               )
 
@@ -119,12 +126,19 @@ ImageDetails.propTypes = {
   controls: PropTypes.bool,
   deleteImage: PropTypes.func,
   loading: PropTypes.bool,
+  fields: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.bool,
+    PropTypes.number,
+    PropTypes.string,
+  ])),
 };
 
 ImageDetails.defaultProps = {
   controls: false,
   deleteImage: () => {},
   loading: false,
+  fields: {},
 };
 
 export default ImageDetails;

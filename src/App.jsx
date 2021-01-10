@@ -6,12 +6,13 @@ import styled from '@emotion/styled';
 import List from './components/List';
 import FormContainer from './container/form';
 import ProductDetails from './components/details';
-// import { fetchProductsRequest } from './store/products';
+import Logo from './assets/useveranologo.png';
 
 const Container = styled('div')`
     align-items: center;
-    display: flex;
     background: white;
+    border-style: dashed;
+    display: flex;
     flex-direction: column;
     height: 90%;
     justify-content: space-between;
@@ -50,6 +51,7 @@ function App() {
   const products = useSelector((state) => state.products);
   const [selectedProduct, setSelectedProduct] = React.useState('1');
   const [formMode, setFormMode] = React.useState(false);
+  const [initialValues, setInitialValues] = React.useState({});
   React.useEffect(() => {
     // dispatch(fetchProductsRequest());
   }, [dispatch]);
@@ -62,9 +64,13 @@ function App() {
           <Button
             close
             color="danger"
-            onClick={() => setFormMode(false)}
+            onClick={() => setFormMode('')}
           />
-          <FormContainer dispatch={dispatch} />
+          <FormContainer
+            formMode={formMode}
+            initialValues={initialValues}
+            dispatch={dispatch}
+          />
         </FormWrapper>
       </FormExternalWrapper>
     );
@@ -72,6 +78,7 @@ function App() {
   return (
     <AppContainer>
       <Container>
+        <img style={{ width: '10vw' }} src={Logo} alt="logo" />
         <List
           data={products.items}
           selected={selectedProduct}
@@ -81,6 +88,8 @@ function App() {
       </Container>
       <Container>
         <ProductDetails
+          dispatch={dispatch}
+          setInitialValues={setInitialValues}
           product={selectedProductDetails}
           setFormMode={setFormMode}
         />

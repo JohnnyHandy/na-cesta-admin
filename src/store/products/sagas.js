@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   put, call, takeLatest, all, select,
 } from 'redux-saga/effects';
@@ -67,6 +68,37 @@ export function* createProduct({ payload }) {
   }
 }
 
+export function* editProduct({ payload }) {
+  try {
+    const productItems = yield select((state) => state.products.items);
+    const findItem = productItems.find((item) => item.id === payload.id);
+    const updateItem = {
+      ...findItem,
+      ...payload,
+    };
+    const updatedProductItems = productItems.map((item) => {
+      if (item.id === findItem.id) {
+        return updateItem;
+      } return item;
+    });
+    yield put(actions.editProductSuccess(updatedProductItems));
+  } catch (error) {
+    console.error(error);
+    yield put(actions.editProductFailure(error));
+  }
+}
+
+export function* deleteProduct({ payload }) {
+  try {
+    const { id } = payload;
+    const productItems = yield select((state) => state.products.items);
+    const updatedProductItems = productItems.filter((item) => item.id !== id);
+    yield put(actions.deleteProductSuccess(updatedProductItems));
+  } catch (error) {
+    yield put(actions.deleteProductFailure(error));
+  }
+}
+
 export function* watchFetchProducts() {
   yield takeLatest(actions.fetchProductsRequest, fetchProducts);
 }
@@ -83,11 +115,21 @@ export function* watchCreateProduct() {
   yield takeLatest(actions.createProductRequest, createProduct);
 }
 
+export function* watchEditProduct() {
+  yield takeLatest(actions.editProductRequest, editProduct);
+}
+
+export function* watchDeleteProduct() {
+  yield takeLatest(actions.deleteProductRequest, deleteProduct);
+}
+
 export default function* ProductsSaga() {
   yield all([
     watchFetchProducts(),
     watchUploadImageToS3(),
     watchDeleteImage(),
     watchCreateProduct(),
+    watchEditProduct(),
+    watchDeleteProduct(),
   ]);
 }

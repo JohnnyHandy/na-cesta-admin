@@ -5,6 +5,7 @@ import { Button } from 'reactstrap';
 
 import ImageDetails from './imageDetails';
 import MeasureDetails from './measuresDetails';
+import { deleteProductRequest } from '../../store/products';
 
 const DetailsSpan = styled('span')`
     align-self: flex-start;
@@ -21,9 +22,12 @@ const ButtonsContainer = styled('div')`
 const ProductDetails = ({
   product,
   setFormMode,
+  setInitialValues,
+  dispatch,
 }) => {
+  console.log('product', product);
   if (!product) {
-    return <span> Select a product </span>;
+    return <span> Selecione um produto. </span>;
   }
   const {
     name = '',
@@ -35,6 +39,7 @@ const ProductDetails = ({
     dealPrice = '',
     isDeal = false,
     quantity = '',
+    id,
   } = product;
   return (
     <>
@@ -77,8 +82,22 @@ const ProductDetails = ({
         {isDeal ? 'Sim' : 'Não'}
       </DetailsSpan>
       <ButtonsContainer>
-        <Button onClick={() => setFormMode()} color="warning"> Editar </Button>
-        <Button color="danger"> Deletar </Button>
+        <Button
+          onClick={() => {
+            setInitialValues(product);
+            setFormMode('edit');
+          }}
+          color="warning"
+        >
+          Editar
+        </Button>
+        <Button
+          color="danger"
+          onClick={() => dispatch(deleteProductRequest({ id }))}
+        >
+          {' '}
+          Deletar
+        </Button>
       </ButtonsContainer>
     </>
   );
@@ -89,10 +108,12 @@ ProductDetails.propTypes = {
     PropTypes.array, PropTypes.string, PropTypes.number, PropTypes.bool,
   ])),
   setFormMode: PropTypes.func.isRequired,
+  setInitialValues: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
 };
 
 ProductDetails.defaultProps = {
-  product: {},
+  product: null,
 };
 
 export default ProductDetails;

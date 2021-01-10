@@ -23,17 +23,23 @@ const ListContainer = styled('div')`
     justify-content: space-between;
     align-items: center
 `;
-const ListItemComponent = ({ data, selected, setSelected }) => data.map((item) => (
-  <ListGroupItem
-    style={
+const ListItemComponent = ({ data, selected, setSelected }) => {
+  if (data.length === 0) {
+    return <h1> Sem produtos cadastrados </h1>;
+  }
+
+  return data.map((item) => (
+    <ListGroupItem
+      style={
             selected === item.id ? selectedStyle : notSelectedStyle
         }
-    key={item.id}
-    onClick={() => setSelected(selected === item.id ? '' : item.id)}
-  >
-    {item.model}
-  </ListGroupItem>
-));
+      key={item.id}
+      onClick={() => setSelected(selected === item.id ? '' : item.id)}
+    >
+      {item.model}
+    </ListGroupItem>
+  ));
+};
 
 const List = ({
   data, selected, setSelected, setFormMode,

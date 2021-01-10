@@ -16,6 +16,14 @@ export const createProductRequest = createAction('Products/CREATE_PRODUCT_REQUES
 export const createProductSuccess = createAction('Products/CREATE_PRODUCT_SUCCESS');
 export const createProductFailure = createAction('Products/CREATE_PRODUCT_FAILURE');
 
+export const editProductRequest = createAction('Products/EDIT_PRODUCT_REQUEST');
+export const editProductSuccess = createAction('Products/EDIT_PRODUCT_SUCCESS');
+export const editProductFailure = createAction('Products/EDIT_PRODUCT_FAILURE');
+
+export const deleteProductRequest = createAction('Products/DELETE_PRODUCT_REQUEST');
+export const deleteProductSuccess = createAction('Products/DELETE_PRODUCT_SUCCESS');
+export const deleteProductFailure = createAction('Products/DELETE_PRODUCT_FAILURE');
+
 export const initialState = {
   items: [],
   isFetching: false,
@@ -98,6 +106,36 @@ export const ProductsReducer = createReducer(initialState, {
     items: action.payload,
   }),
   [createProductFailure]: (state, action) => ({
+    ...state,
+    isFetching: false,
+    error: action.payload,
+  }),
+  [editProductRequest]: (state) => ({
+    ...state,
+    isFetching: true,
+    error: null,
+  }),
+  [editProductSuccess]: (state, action) => ({
+    ...state,
+    isFetching: false,
+    items: action.payload,
+  }),
+  [editProductFailure]: (state, action) => ({
+    ...state,
+    isFetching: false,
+    error: action.payload,
+  }),
+  [deleteProductRequest]: (state) => ({
+    ...state,
+    isFetching: true,
+    error: null,
+  }),
+  [deleteProductSuccess]: (state, action) => ({
+    ...state,
+    isFetching: false,
+    items: action.payload,
+  }),
+  [deleteProductFailure]: (state, action) => ({
     ...state,
     isFetching: false,
     error: action.payload,

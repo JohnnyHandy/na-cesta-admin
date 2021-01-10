@@ -47,7 +47,7 @@ const StyledNavLink = styled(NavLink)`
 `;
 
 const StyledTabPane = styled(TabPane)`
-  max-height: 80vh;
+  max-height: 75vh;
   overflow: auto;
   padding: 1vh 1vw
 `;
@@ -68,11 +68,12 @@ const InputLabel = styled(Label)`
     display: block
 `;
 const RenderSelectInput = ({
-  input, options, disabledOptions,
+  input, options, disabledOptions, style,
 }) => (
   <Select
     size="sm"
     type="select"
+    style={style}
     {...input}
   >
     {options.map((item) => (
@@ -220,6 +221,9 @@ const ProductDataSection = () => (
         'saida',
         'maiô',
       ]}
+      style={{
+        width: '12vw',
+      }}
     />
     <InputLabel htmlFor="description">Descrição</InputLabel>
     <Field
@@ -273,6 +277,9 @@ const ProductForm = (props) => {
       <FormSection>
         <Nav
           tabs
+          style={{
+            position: 'relative',
+          }}
         >
           <NavItem>
             <StyledNavLink
@@ -298,12 +305,16 @@ const ProductForm = (props) => {
               Fotos
             </StyledNavLink>
           </NavItem>
+          <Button
+            type="submit"
+            style={{
+              position: 'absolute',
+              right: '0',
+            }}
+          >
+            Salvar Produto
+          </Button>
         </Nav>
-        <Button
-          type="submit"
-        >
-          Salvar Produto
-        </Button>
         <TabContent activeTab={activeTab}>
           <StyledTabPane tabId="1">
             <ProductDataSection />
@@ -350,6 +361,10 @@ RenderSelectInput.propTypes = {
   ])).isRequired,
   options: PropTypes.arrayOf(PropTypes.string).isRequired,
   disabledOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  style: PropTypes.objectOf(PropTypes.object),
+};
+RenderSelectInput.defaultProps = {
+  style: {},
 };
 
 Checkbox.propTypes = {

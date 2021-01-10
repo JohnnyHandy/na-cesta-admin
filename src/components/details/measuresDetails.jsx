@@ -12,7 +12,7 @@ const MeasureDetails = ({
       <tr>
         <th>Medidas </th>
         {details.map((item) => (
-          <th key={item.size} style={{ textAlign: 'center' }}>{item.size}</th>
+          <th key={item.size} style={{ textAlign: 'center' }}>{item.measure}</th>
         ))}
       </tr>
     </thead>
@@ -20,7 +20,7 @@ const MeasureDetails = ({
       <tr>
         <td>Cores</td>
         {details.map((detail) => (
-          <td key={detail.size}>
+          <td key={detail.measure}>
             {detail.colors.map((color) => {
               const findColor = colorOptions.find((colorItem) => colorItem.id === color.colorId);
               return (
