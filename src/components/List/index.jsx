@@ -28,17 +28,20 @@ const ListItemComponent = ({ data, selected, setSelected }) => {
     return <h1> Sem produtos cadastrados </h1>;
   }
 
-  return data.map((item) => (
-    <ListGroupItem
-      style={
-            selected === item.id ? selectedStyle : notSelectedStyle
+  return data.map((item) => {
+    const id = item.ProductId;
+    return (
+      <ListGroupItem
+        style={
+            selected === id ? selectedStyle : notSelectedStyle
         }
-      key={item.id}
-      onClick={() => setSelected(selected === item.id ? '' : item.id)}
-    >
-      {item.model}
-    </ListGroupItem>
-  ));
+        key={id}
+        onClick={() => setSelected(selected === id ? '' : id)}
+      >
+        {item.model}
+      </ListGroupItem>
+    );
+  });
 };
 
 const List = ({

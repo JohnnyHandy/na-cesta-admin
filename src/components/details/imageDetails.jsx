@@ -5,7 +5,7 @@ import { Button } from 'reactstrap';
 import { AiOutlineCloseSquare } from 'react-icons/ai';
 import { CgArrowLeftR, CgArrowRightR } from 'react-icons/cg';
 
-import Loading from '../loading';
+// import Loading from '../loading';
 
 const ImageDetailsContainer = styled('div')`
   align-items: center;
@@ -46,13 +46,9 @@ const ImageIcon = styled('img')`
 `;
 
 const ImageDetails = ({
-  images, controls, deleteImage, loading, fields,
+  images, controls, deleteImage, fields,
 }) => {
   const [showImageIndex, setShowImageIndex] = React.useState(0);
-  console.log('fields', fields);
-  if (loading) {
-    return <Loading />;
-  }
   if (!images || !images[showImageIndex]) {
     return <span> Sem imagens adicionadas </span>;
   }
@@ -125,7 +121,6 @@ ImageDetails.propTypes = {
   images: PropTypes.arrayOf(PropTypes.object).isRequired,
   controls: PropTypes.bool,
   deleteImage: PropTypes.func,
-  loading: PropTypes.bool,
   fields: PropTypes.objectOf(PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.bool,
@@ -137,7 +132,6 @@ ImageDetails.propTypes = {
 ImageDetails.defaultProps = {
   controls: false,
   deleteImage: () => {},
-  loading: false,
   fields: {},
 };
 

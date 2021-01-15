@@ -5,10 +5,10 @@ import FormComponent from '../../components/form';
 import { createProductRequest, editProductRequest } from '../../store/products';
 
 const FormContainer = (props) => {
-  const { dispatch, formMode } = props;
+  const { dispatch, formMode, setFormMode } = props;
   const onSubmit = (data) => {
     if (formMode === 'create') {
-      return dispatch(createProductRequest(data));
+      return dispatch(createProductRequest({ data, setFormMode }));
     }
     return dispatch(editProductRequest(data));
   };
@@ -23,6 +23,7 @@ FormContainer.propTypes = {
     PropTypes.bool,
   ])),
   formMode: PropTypes.string.isRequired,
+  setFormMode: PropTypes.func.isRequired,
 };
 
 FormContainer.defaultProps = {

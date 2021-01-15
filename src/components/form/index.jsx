@@ -147,14 +147,14 @@ const renderColorsForm = ({ fields }) => {
 
 const renderDetailsForm = ({ fields }) => {
   const value = fields.getAll();
-  const getMeasures = value && value.map(((item) => item.measure));
+  const getSizes = value && value.map(((item) => item.size));
   return (
     <>
       <Button
         disabled={fields.length >= 3}
         onClick={() => {
           fields.push({
-            measure: '',
+            size: '',
           });
         }}
       >
@@ -173,14 +173,14 @@ const renderDetailsForm = ({ fields }) => {
             <SizeChoiceContainer>
               <Field
                 component={RenderSelectInput}
-                name={`${newItem}.measure`}
+                name={`${newItem}.size`}
                 label="Tamanho"
                 options={sizeOptions}
-                disabledOptions={getMeasures}
+                disabledOptions={getSizes}
               />
               <Button close onClick={() => fields.remove(fieldIndex)} />
             </SizeChoiceContainer>
-            {getMeasures[fieldIndex]
+            {getSizes[fieldIndex]
                         && (
                           <FieldArray
                             name={`${newItem}.colors`}
@@ -360,11 +360,14 @@ RenderSelectInput.propTypes = {
     PropTypes.func,
   ])).isRequired,
   options: PropTypes.arrayOf(PropTypes.string).isRequired,
-  disabledOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
-  style: PropTypes.objectOf(PropTypes.object),
+  disabledOptions: PropTypes.arrayOf(PropTypes.string),
+  style: PropTypes.objectOf(PropTypes.oneOf([
+    PropTypes.string,
+  ])),
 };
 RenderSelectInput.defaultProps = {
   style: {},
+  disabledOptions: [],
 };
 
 Checkbox.propTypes = {

@@ -7,6 +7,7 @@ import List from './components/List';
 import FormContainer from './container/form';
 import ProductDetails from './components/details';
 import Logo from './assets/useveranologo.png';
+import { fetchProductsRequest } from './store/products';
 
 const Container = styled('div')`
     align-items: center;
@@ -53,7 +54,7 @@ function App() {
   const [formMode, setFormMode] = React.useState(false);
   const [initialValues, setInitialValues] = React.useState({});
   React.useEffect(() => {
-    // dispatch(fetchProductsRequest());
+    dispatch(fetchProductsRequest());
   }, [dispatch]);
 
   const selectedProductDetails = products.items.find((item) => item.id === selectedProduct);
@@ -70,6 +71,7 @@ function App() {
             formMode={formMode}
             initialValues={initialValues}
             dispatch={dispatch}
+            setFormMode={setFormMode}
           />
         </FormWrapper>
       </FormExternalWrapper>

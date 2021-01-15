@@ -100,10 +100,9 @@ export const ProductsReducer = createReducer(initialState, {
     isFetching: true,
     error: null,
   }),
-  [createProductSuccess]: (state, action) => ({
+  [createProductSuccess]: (state) => ({
     ...state,
     isFetching: false,
-    items: action.payload,
   }),
   [createProductFailure]: (state, action) => ({
     ...state,

@@ -4,6 +4,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import { all } from 'redux-saga/effects';
 import { combineReducers } from 'redux';
 import { reducer as formReducer } from 'redux-form';
+import { reducer as notifications } from 'react-notification-system-redux';
 import storage from 'redux-persist/lib/storage';
 
 import ProductSagas from './products/sagas';
@@ -12,7 +13,7 @@ import { ProductsReducer } from './products/index';
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['form'],
+  blacklist: ['form', 'products'],
 };
 
 const sagaMiddleware = createSagaMiddleware();
@@ -25,6 +26,7 @@ export function* rootSaga() {
 const rootReducer = combineReducers({
   products: ProductsReducer,
   form: formReducer,
+  notifications,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

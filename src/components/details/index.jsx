@@ -25,7 +25,6 @@ const ProductDetails = ({
   setInitialValues,
   dispatch,
 }) => {
-  console.log('product', product);
   if (!product) {
     return <span> Selecione um produto. </span>;
   }
@@ -39,7 +38,7 @@ const ProductDetails = ({
     dealPrice = '',
     isDeal = false,
     quantity = '',
-    id,
+    productId,
   } = product;
   return (
     <>
@@ -93,7 +92,7 @@ const ProductDetails = ({
         </Button>
         <Button
           color="danger"
-          onClick={() => dispatch(deleteProductRequest({ id }))}
+          onClick={() => dispatch(deleteProductRequest({ productId }))}
         >
           {' '}
           Deletar

@@ -4,7 +4,7 @@ import { Table } from 'reactstrap';
 
 import { colors as colorOptions } from '../../utils/constants';
 
-const MeasureDetails = ({
+const SizeDetails = ({
   details,
 }) => (
   <Table>
@@ -12,7 +12,7 @@ const MeasureDetails = ({
       <tr>
         <th>Medidas </th>
         {details.map((item) => (
-          <th key={item.size} style={{ textAlign: 'center' }}>{item.measure}</th>
+          <th key={item.size} style={{ textAlign: 'center' }}>{item.size}</th>
         ))}
       </tr>
     </thead>
@@ -20,7 +20,7 @@ const MeasureDetails = ({
       <tr>
         <td>Cores</td>
         {details.map((detail) => (
-          <td key={detail.measure}>
+          <td key={detail.size}>
             {detail.colors.map((color) => {
               const findColor = colorOptions.find((colorItem) => colorItem.id === color.colorId);
               return (
@@ -47,8 +47,8 @@ const MeasureDetails = ({
   </Table>
 );
 
-MeasureDetails.propTypes = {
+SizeDetails.propTypes = {
   details: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
-export default MeasureDetails;
+export default SizeDetails;

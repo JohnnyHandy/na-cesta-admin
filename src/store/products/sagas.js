@@ -2,14 +2,22 @@
 import {
   put, call, takeLatest, all, select,
 } from 'redux-saga/effects';
+import { success } from 'react-notification-system-redux';
 import { generateId } from '../../utils/functions';
 import * as actions from '.';
 import * as services from './services';
 
 export function* fetchProducts() {
   try {
-    const products = yield call(services.fetchProducts);
-    yield put(actions.fetchProductsSuccess(products));
+    const params = {
+      data: {
+        action: 'scan',
+      },
+      method: 'POST',
+    };
+    const response = yield call(services.productsApi, { ...params });
+    const productsData = response.data;
+    yield put(actions.fetchProductsSuccess(productsData));
   } catch (error) {
     yield put(actions.fetchProductsFailure);
   }
@@ -31,10 +39,22 @@ export function* uploadImageToS3({ payload }) {
     const uploadImageResponse = yield call(
       services.uploadImageWithSignedUrl, { url: preSignedUrl, data: file, type: info.type },
     );
-    if (uploadImageResponse.statusText === 'OK') fields.push({ key: objectKey });
-    yield put(actions.uploadImageSuccess());
+    if (uploadImageResponse.statusText === 'OK') {
+      fields.push({ key: objectKey });
+      yield put(success({
+        title: 'Upload de imagem',
+        message: 'Sucesso!',
+        autoDismiss: 1,
+      }));
+      yield put(actions.uploadImageSuccess());
+    }
   } catch (error) {
     console.error(error);
+    yield put(error({
+      title: 'Upload de imagem',
+      message: 'Erro!',
+      autoDismiss: 1,
+    }));
     yield put(actions.uploadImageFailure(error));
   }
 }
@@ -50,20 +70,53 @@ export function* deleteS3Image({ payload }) {
     const response = yield call(services.lambdaS3Service, params);
     if (response.statusText === 'OK') {
       fields.remove(index);
+      yield put(success({
+        title: 'Exclusão de imagem',
+        message: 'Sucesso!',
+        autoDismiss: 1,
+      }));
       yield put(actions.deleteImageSuccess());
     }
   } catch (error) {
+    yield put(error({
+      title: 'Exclusão de imagem',
+      message: 'Erro!',
+      autoDismiss: 1,
+    }));
     yield put(actions.deleteImageFailure());
   }
 }
 
 export function* createProduct({ payload }) {
   try {
-    const id = generateId(5);
-    const productItems = yield select((state) => state.products.items);
-    const newArray = productItems.concat({ ...payload, id });
-    yield put(actions.createProductSuccess(newArray));
+    const { setFormMode, data } = payload;
+    const id = generateId(8);
+    // const productItems = yield select((state) => state.products.items);
+    const params = {
+      data: {
+        product: { ...data, id },
+        action: 'create',
+      },
+      method: 'POST',
+    };
+    const response = yield call(services.productsApi, { ...params });
+    if (response.status === 200) {
+      yield put(success({
+        title: 'Criação de produto',
+        message: 'Sucesso!',
+        autoDismiss: 1,
+      }));
+      setFormMode('');
+      yield put(actions.createProductSuccess());
+      yield put(actions.fetchProductsRequest());
+    }
   } catch (error) {
+    console.error(error);
+    yield put(error({
+      title: 'Criação de produto',
+      message: 'Erro',
+      autoDismiss: 1,
+    }));
     yield put(actions.createProductFailure());
   }
 }
