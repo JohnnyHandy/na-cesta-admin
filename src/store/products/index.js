@@ -114,10 +114,9 @@ export const ProductsReducer = createReducer(initialState, {
     isFetching: true,
     error: null,
   }),
-  [editProductSuccess]: (state, action) => ({
+  [editProductSuccess]: (state) => ({
     ...state,
     isFetching: false,
-    items: action.payload,
   }),
   [editProductFailure]: (state, action) => ({
     ...state,
@@ -129,10 +128,9 @@ export const ProductsReducer = createReducer(initialState, {
     isFetching: true,
     error: null,
   }),
-  [deleteProductSuccess]: (state, action) => ({
+  [deleteProductSuccess]: (state) => ({
     ...state,
     isFetching: false,
-    items: action.payload,
   }),
   [deleteProductFailure]: (state, action) => ({
     ...state,

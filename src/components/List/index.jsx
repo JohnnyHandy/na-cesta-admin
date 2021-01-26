@@ -29,14 +29,16 @@ const ListItemComponent = ({ data, selected, setSelected }) => {
   }
 
   return data.map((item) => {
+    console.log('item', item);
     const id = item.ProductId;
+    console.log('id', id);
     return (
       <ListGroupItem
         style={
             selected === id ? selectedStyle : notSelectedStyle
         }
         key={id}
-        onClick={() => setSelected(selected === id ? '' : id)}
+        onClick={() => setSelected(id)}
       >
         {item.model}
       </ListGroupItem>

@@ -10,7 +10,7 @@ const FormContainer = (props) => {
     if (formMode === 'create') {
       return dispatch(createProductRequest({ data, setFormMode }));
     }
-    return dispatch(editProductRequest(data));
+    return dispatch(editProductRequest({ data, setFormMode }));
   };
   return <FormComponent onSubmit={onSubmit} {...props} />;
 };

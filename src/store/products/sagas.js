@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import {
-  put, call, takeLatest, all, select,
+  put, call, takeLatest, all,
 } from 'redux-saga/effects';
 import { success } from 'react-notification-system-redux';
 import { generateId } from '../../utils/functions';
@@ -16,7 +16,11 @@ export function* fetchProducts() {
       method: 'POST',
     };
     const response = yield call(services.productsApi, { ...params });
-    const productsData = response.data;
+    const productsData = response?.data?.map((item) => ({
+      ...item,
+      price: String(item.price),
+      dealPrice: String(item.dealPrice),
+    }));
     yield put(actions.fetchProductsSuccess(productsData));
   } catch (error) {
     yield put(actions.fetchProductsFailure);
@@ -91,7 +95,6 @@ export function* createProduct({ payload }) {
   try {
     const { setFormMode, data } = payload;
     const id = generateId(8);
-    // const productItems = yield select((state) => state.products.items);
     const params = {
       data: {
         product: { ...data, id },
@@ -117,37 +120,71 @@ export function* createProduct({ payload }) {
       message: 'Erro',
       autoDismiss: 1,
     }));
-    yield put(actions.createProductFailure());
+    yield put(actions.createProductFailure(error));
   }
 }
 
 export function* editProduct({ payload }) {
   try {
-    const productItems = yield select((state) => state.products.items);
-    const findItem = productItems.find((item) => item.id === payload.id);
-    const updateItem = {
-      ...findItem,
-      ...payload,
+    const { data, setFormMode } = payload;
+    const params = {
+      data: {
+        product: { ...data },
+        action: 'update',
+      },
+      method: 'PUT',
     };
-    const updatedProductItems = productItems.map((item) => {
-      if (item.id === findItem.id) {
-        return updateItem;
-      } return item;
-    });
-    yield put(actions.editProductSuccess(updatedProductItems));
+    const response = yield call(services.productsApi, { ...params });
+    if (response.status === 200) {
+      yield put(success({
+        title: 'Edição de Produto',
+        message: 'Sucesso!',
+        autoDismiss: 1,
+      }));
+      yield put(actions.editProductSuccess());
+      yield put(actions.fetchProductsRequest());
+      setFormMode('');
+    }
   } catch (error) {
     console.error(error);
+    yield put(error({
+      title: 'Edição de produto',
+      message: 'Erro',
+      autoDismiss: 1,
+    }));
     yield put(actions.editProductFailure(error));
   }
 }
 
 export function* deleteProduct({ payload }) {
   try {
-    const { id } = payload;
-    const productItems = yield select((state) => state.products.items);
-    const updatedProductItems = productItems.filter((item) => item.id !== id);
-    yield put(actions.deleteProductSuccess(updatedProductItems));
+    const { ProductId } = payload;
+    const params = {
+      data: {
+        product: {
+          ProductId,
+        },
+        action: 'delete',
+      },
+      method: 'DELETE',
+    };
+    const response = yield call(services.productsApi, { ...params });
+    if (response.status === 200) {
+      yield put(success({
+        title: 'Exclusão de Produto',
+        message: 'Sucesso!',
+        autoDismiss: 1,
+      }));
+      yield put(actions.deleteProductSuccess());
+      yield put(actions.fetchProductsRequest());
+    }
   } catch (error) {
+    yield put(error({
+      title: 'Exclusão de produto',
+      message: 'Erro',
+      autoDismiss: 1,
+    }));
+
     yield put(actions.deleteProductFailure(error));
   }
 }

@@ -6,6 +6,7 @@ import { Button } from 'reactstrap';
 import ImageDetails from './imageDetails';
 import MeasureDetails from './measuresDetails';
 import { deleteProductRequest } from '../../store/products';
+import ModalComponent from '../modal/index';
 
 const DetailsSpan = styled('span')`
     align-self: flex-start;
@@ -38,8 +39,15 @@ const ProductDetails = ({
     dealPrice = '',
     isDeal = false,
     quantity = '',
-    productId,
+    ProductId,
   } = product;
+
+  const [modal, setModal] = React.useState(false);
+  const toggle = () => setModal(!modal);
+  const deleteProductCall = () => {
+    dispatch(deleteProductRequest({ ProductId }));
+    toggle();
+  };
   return (
     <>
       <span>
@@ -92,11 +100,12 @@ const ProductDetails = ({
         </Button>
         <Button
           color="danger"
-          onClick={() => dispatch(deleteProductRequest({ productId }))}
+          onClick={toggle}
         >
           {' '}
           Deletar
         </Button>
+        <ModalComponent toggle={toggle} modal={modal} confirmDelete={deleteProductCall} />
       </ButtonsContainer>
     </>
   );
