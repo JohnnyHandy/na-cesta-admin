@@ -72,7 +72,7 @@ export function* deleteS3Image({ payload }) {
       method: 'DELETE',
     };
     const response = yield call(services.lambdaS3Service, params);
-    if (response.statusText === 'OK') {
+    if (response.status === 200) {
       fields.remove(index);
       yield put(success({
         title: 'Exclusão de imagem',

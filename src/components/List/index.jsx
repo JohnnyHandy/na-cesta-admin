@@ -29,9 +29,7 @@ const ListItemComponent = ({ data, selected, setSelected }) => {
   }
 
   return data.map((item) => {
-    console.log('item', item);
     const id = item.ProductId;
-    console.log('id', id);
     return (
       <ListGroupItem
         style={
