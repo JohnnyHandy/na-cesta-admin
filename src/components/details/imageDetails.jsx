@@ -68,10 +68,13 @@ const ImageDetails = ({
         <Button
           size="sm"
           color="danger"
-          onClick={() => deleteImage({
-            objectKey: images[showImageIndex].objectKey,
-            index: showImageIndex,
-          })}
+          onClick={() => {
+            setShowImageIndex(showImageIndex > 1 ? showImageIndex - 1 : 0);
+            deleteImage({
+              objectKey: images[showImageIndex].objectKey,
+              index: showImageIndex,
+            });
+          }}
         >
           Excluir
           {' '}

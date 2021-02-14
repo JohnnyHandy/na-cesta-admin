@@ -5,14 +5,30 @@ import FormComponent from '../../components/form';
 import { createProductRequest, editProductRequest } from '../../store/products';
 
 const FormContainer = (props) => {
-  const { dispatch, formMode, setFormMode } = props;
+  const {
+    dispatch, formMode, setFormMode, imagesToDelete, setImagesToDelete,
+  } = props;
   const onSubmit = (data) => {
     if (formMode === 'create') {
-      return dispatch(createProductRequest({ data, setFormMode }));
+      let formatedData = data;
+      if (data.isDeal === undefined) {
+        formatedData = {
+          ...data,
+          isDeal: false,
+        };
+      }
+      return dispatch(createProductRequest({ data: formatedData, setFormMode, imagesToDelete }));
     }
-    return dispatch(editProductRequest({ data, setFormMode }));
+    return dispatch(editProductRequest({ data, setFormMode, imagesToDelete }));
   };
-  return <FormComponent onSubmit={onSubmit} {...props} />;
+  return (
+    <FormComponent
+      imagesToDelete={imagesToDelete}
+      setImagesToDelete={setImagesToDelete}
+      onSubmit={onSubmit}
+      {...props}
+    />
+  );
 };
 
 FormContainer.propTypes = {
@@ -21,9 +37,12 @@ FormContainer.propTypes = {
     PropTypes.object,
     PropTypes.number,
     PropTypes.bool,
+    PropTypes.string,
   ])),
   formMode: PropTypes.string.isRequired,
   setFormMode: PropTypes.func.isRequired,
+  imagesToDelete: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setImagesToDelete: PropTypes.func.isRequired,
 };
 
 FormContainer.defaultProps = {

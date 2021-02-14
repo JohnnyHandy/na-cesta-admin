@@ -53,6 +53,7 @@ function App() {
   const [selectedProduct, setSelectedProduct] = React.useState('');
   const [formMode, setFormMode] = React.useState(false);
   const [initialValues, setInitialValues] = React.useState({});
+  const [imagesToDelete, setImagesToDelete] = React.useState([]);
   React.useEffect(() => {
     dispatch(fetchProductsRequest());
   }, [dispatch]);
@@ -65,9 +66,14 @@ function App() {
           <Button
             close
             color="danger"
-            onClick={() => setFormMode('')}
+            onClick={() => {
+              setImagesToDelete([]);
+              setFormMode('');
+            }}
           />
           <FormContainer
+            imagesToDelete={imagesToDelete}
+            setImagesToDelete={setImagesToDelete}
             formMode={formMode}
             initialValues={initialValues}
             dispatch={dispatch}

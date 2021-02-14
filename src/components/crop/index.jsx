@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import 'react-dropzone-uploader/dist/styles.css';
 import 'react-image-crop/dist/ReactCrop.css';
 
+import { propTypes } from 'react-notification-system';
 import ImageDetails from '../details/imageDetails';
 import { uploadImageRequest, deleteImageRequest } from '../../store/products';
 
@@ -40,7 +41,9 @@ function getResizedCanvas(canvas, newWidth, newHeight) {
 }
 
 export default function UploadCrop(props) {
-  const { fields, values, productsState } = props;
+  const {
+    fields, values, productsState, setImagesToDelete, imagesToDelete,
+  } = props;
   const dispatch = useDispatch();
   const [upImg, setUpImg] = useState();
   const imgRef = useRef(null);
@@ -119,10 +122,17 @@ export default function UploadCrop(props) {
     );
   }, [completedCrop]);
 
-  const deleteImage = (params) => dispatch(deleteImageRequest({
-    ...params,
-    fields,
-  }));
+  const deleteImage = (params) => {
+    const { index, objectKey } = params;
+    const newArrayOfImages = imagesToDelete.concat({ Key: objectKey });
+    setImagesToDelete(newArrayOfImages);
+    console.log('index', index);
+    fields.remove(index);
+  //   dispatch(deleteImageRequest({
+  //   ...params,
+  //   fields,
+  // }))
+  };
   return (
     <div style={{
       display: 'flex',
@@ -244,6 +254,8 @@ UploadCrop.propTypes = {
     PropTypes.array,
     PropTypes.object,
   ])),
+  imagesToDelete: PropTypes.arrayOf(propTypes.object),
+  setImagesToDelete: PropTypes.func.isRequired,
 };
 
 UploadCrop.defaultProps = {
@@ -254,4 +266,5 @@ UploadCrop.defaultProps = {
     items: [],
     images: {},
   },
+  imagesToDelete: [],
 };

@@ -31,7 +31,7 @@ export function* uploadImageToS3({ payload }) {
   const { info, file, fields } = payload;
   try {
     const newId = generateId(9);
-    const objectKey = `images/${newId}${info.name}`;
+    const objectKey = `images/${newId}${info.name.replace(/\s/g, '-')}`;
     const params = {
       object_key: objectKey,
       type: info.type,
@@ -64,18 +64,21 @@ export function* uploadImageToS3({ payload }) {
 }
 
 export function* deleteS3Image({ payload }) {
-  const { objectKey, fields, index } = payload;
+  const { imagesToDelete } = payload;
   try {
     const params = {
-      object_key: objectKey,
+      attributes: {
+        Objects: [
+          ...imagesToDelete,
+        ],
+      },
       action: 'deleteObject',
       method: 'DELETE',
     };
     const response = yield call(services.lambdaS3Service, params);
     if (response.status === 200) {
-      fields.remove(index);
       yield put(success({
-        title: 'Exclusão de imagem',
+        title: 'Exclusão de imagens',
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
@@ -93,7 +96,10 @@ export function* deleteS3Image({ payload }) {
 
 export function* createProduct({ payload }) {
   try {
-    const { setFormMode, data } = payload;
+    const { setFormMode, data, imagesToDelete } = payload;
+    if (imagesToDelete.length) {
+      yield put(actions.deleteImageRequest({ imagesToDelete }));
+    }
     const id = generateId(8);
     const params = {
       data: {
@@ -126,7 +132,10 @@ export function* createProduct({ payload }) {
 
 export function* editProduct({ payload }) {
   try {
-    const { data, setFormMode } = payload;
+    const { data, setFormMode, imagesToDelete } = payload;
+    if (imagesToDelete.length) {
+      yield put(actions.deleteImageRequest({ imagesToDelete }));
+    }
     const params = {
       data: {
         product: { ...data },
@@ -158,7 +167,10 @@ export function* editProduct({ payload }) {
 
 export function* deleteProduct({ payload }) {
   try {
-    const { ProductId } = payload;
+    const { ProductId, imagesToDelete } = payload;
+    if (imagesToDelete.length) {
+      yield put(actions.deleteImageRequest({ imagesToDelete }));
+    }
     const params = {
       data: {
         product: {

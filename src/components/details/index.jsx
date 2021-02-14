@@ -45,7 +45,10 @@ const ProductDetails = ({
   const [modal, setModal] = React.useState(false);
   const toggle = () => setModal(!modal);
   const deleteProductCall = () => {
-    dispatch(deleteProductRequest({ ProductId }));
+    dispatch(deleteProductRequest({
+      ProductId,
+      imagesToDelete: images.map((item) => ({ Key: item.key })),
+    }));
     toggle();
   };
   return (

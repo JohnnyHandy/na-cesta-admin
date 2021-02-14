@@ -257,7 +257,7 @@ const ProductDataSection = () => (
 );
 
 const ProductForm = (props) => {
-  const { handleSubmit } = props;
+  const { handleSubmit, imagesToDelete, setImagesToDelete } = props;
   const state = useSelector((getState) => getState);
   const productsState = state.products;
   const formValues = getFormValues('productsForm')(state);
@@ -319,20 +319,18 @@ const ProductForm = (props) => {
           <StyledTabPane tabId="1">
             <ProductDataSection />
           </StyledTabPane>
-          <StyledTabPane
-            tabId="2"
-          >
+          <StyledTabPane tabId="2">
             <FieldArray
               name="details"
               component={renderDetailsForm}
               value={detailsFormValue}
             />
           </StyledTabPane>
-          <StyledTabPane
-            tabId="3"
-          >
+          <StyledTabPane tabId="3">
             Selecione as imagens
             <FieldArray
+              imagesToDelete={imagesToDelete}
+              setImagesToDelete={setImagesToDelete}
               productsState={productsState}
               name="images"
               component={UploadComponent}
@@ -380,6 +378,13 @@ Checkbox.propTypes = {
 
 ProductForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  imagesToDelete: PropTypes.arrayOf(PropTypes.object),
+  setImagesToDelete: PropTypes.func,
+};
+
+ProductForm.defaultProps = {
+  imagesToDelete: [],
+  setImagesToDelete: () => {},
 };
 
 TextAreaInput.propTypes = {
