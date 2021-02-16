@@ -126,7 +126,6 @@ export default function UploadCrop(props) {
     const { index, objectKey } = params;
     const newArrayOfImages = imagesToDelete.concat({ Key: objectKey });
     setImagesToDelete(newArrayOfImages);
-    console.log('index', index);
     fields.remove(index);
   //   dispatch(deleteImageRequest({
   //   ...params,

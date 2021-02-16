@@ -17,6 +17,7 @@ const Container = styled('div')`
     flex-direction: column;
     height: 90%;
     justify-content: space-between;
+    overflow: auto;
     padding: 2%;
 `;
 
