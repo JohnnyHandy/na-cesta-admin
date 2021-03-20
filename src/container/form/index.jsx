@@ -9,17 +9,20 @@ const FormContainer = (props) => {
     dispatch, formMode, setFormMode, imagesToDelete, setImagesToDelete,
   } = props;
   const onSubmit = (data) => {
+    let formatedData = {
+      ...data,
+      availableSizes: data.details.map((detail) => detail.size),
+    };
     if (formMode === 'create') {
-      let formatedData = data;
       if (data.isDeal === undefined) {
         formatedData = {
-          ...data,
+          ...formatedData,
           isDeal: false,
         };
       }
       return dispatch(createProductRequest({ data: formatedData, setFormMode, imagesToDelete }));
     }
-    return dispatch(editProductRequest({ data, setFormMode, imagesToDelete }));
+    return dispatch(editProductRequest({ data: formatedData, setFormMode, imagesToDelete }));
   };
   return (
     <FormComponent
