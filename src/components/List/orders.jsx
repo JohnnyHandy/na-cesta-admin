@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ListGroup, ListGroupItem, Button } from 'reactstrap';
+import { ListGroup, ListGroupItem } from 'reactstrap';
 import styled from '@emotion/styled';
 
 const selectedStyle = {
@@ -25,11 +25,11 @@ const ListContainer = styled('div')`
 `;
 const ListItemComponent = ({ data, selected, setSelected }) => {
   if (data.length === 0) {
-    return <h1> Sem produtos cadastrados </h1>;
+    return <h1> Sem pedidos cadastrados </h1>;
   }
 
   return data.map((item) => {
-    const id = item.ProductId;
+    const id = item.OrderId;
     return (
       <ListGroupItem
         style={
@@ -38,41 +38,41 @@ const ListItemComponent = ({ data, selected, setSelected }) => {
         key={id}
         onClick={() => setSelected(id)}
       >
-        {item.model}
+        {id}
       </ListGroupItem>
     );
   });
 };
 
 const List = ({
-  data, selected, setSelected, setFormMode,
-}) => (
-  <ListContainer>
-    <ListGroup
-      style={{
-        width: '100%',
-      }}
-    >
-      <ListItemComponent
-        data={data}
-        selected={selected}
-        setSelected={setSelected}
-      />
-    </ListGroup>
-    <Button
-      color="primary"
-      onClick={() => setFormMode('create')}
-    >
-      Criar Produto
-    </Button>
-  </ListContainer>
-);
+  data, selected, setSelected, dispatch, fetchItems,
+}) => {
+  React.useEffect(() => {
+    dispatch(fetchItems());
+  }, []);
+  return (
+    <ListContainer>
+      <ListGroup
+        style={{
+          width: '100%',
+        }}
+      >
+        <ListItemComponent
+          data={data}
+          selected={selected}
+          setSelected={setSelected}
+        />
+      </ListGroup>
+    </ListContainer>
+  );
+};
 
 List.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   selected: PropTypes.string.isRequired,
   setSelected: PropTypes.func.isRequired,
-  setFormMode: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  fetchItems: PropTypes.func.isRequired,
 };
 
 export default List;

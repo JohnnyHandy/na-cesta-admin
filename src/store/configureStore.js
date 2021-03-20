@@ -9,6 +9,8 @@ import storage from 'redux-persist/lib/storage';
 
 import ProductSagas from './products/sagas';
 import { ProductsReducer } from './products/index';
+import { OrdersReducer } from './orders';
+import OrdersSaga from './orders/sagas';
 
 const persistConfig = {
   key: 'root',
@@ -20,11 +22,13 @@ const sagaMiddleware = createSagaMiddleware();
 export function* rootSaga() {
   yield all([
     ProductSagas(),
+    OrdersSaga(),
   ]);
 }
 
 const rootReducer = combineReducers({
   products: ProductsReducer,
+  orders: OrdersReducer,
   form: formReducer,
   notifications,
 });
