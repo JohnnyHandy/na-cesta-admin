@@ -2,89 +2,30 @@
 import {
   put, call, takeLatest, all,
 } from 'redux-saga/effects';
-import { success } from 'react-notification-system-redux';
-import { generateId } from '../../utils/functions';
+import { success, error, warning } from 'react-notification-system-redux';
 import * as actions from '.';
 import * as services from './services';
 
-export function* fetchProducts() {
+export function* deleteImage({ payload }) {
+  const {
+    imagesToDelete,
+  } = payload;
   try {
-    const params = {
-      data: {
-        action: 'scan',
-      },
-      method: 'POST',
-    };
-    const response = yield call(services.productsApi, { ...params });
-    const productsData = response?.data?.map((item) => ({
-      ...item,
-      price: String(item.price),
-      dealPrice: String(item.dealPrice),
+    yield all(imagesToDelete.map((image) => {
+      const params = {
+        imageId: image.id,
+        productId: image.productId,
+      };
+      return call(services.deleteImage, { ...params });
     }));
-    yield put(actions.fetchProductsSuccess(productsData));
-  } catch (error) {
-    yield put(actions.fetchProductsFailure);
-  }
-}
-
-export function* uploadImageToS3({ payload }) {
-  const { info, file, fields } = payload;
-  try {
-    const newId = generateId(9);
-    const objectKey = `images/${newId}${info.name.replace(/\s/g, '-')}`;
-    const params = {
-      object_key: objectKey,
-      type: info.type,
-      action: 'getSignedUrl',
-      method: 'POST',
-    };
-    const getUrlResponse = yield call(services.lambdaS3Service, params);
-    const preSignedUrl = getUrlResponse.data.url;
-    const uploadImageResponse = yield call(
-      services.uploadImageWithSignedUrl, { url: preSignedUrl, data: file, type: info.type },
-    );
-    if (uploadImageResponse.statusText === 'OK') {
-      fields.push({ key: objectKey });
-      yield put(success({
-        title: 'Upload de imagem',
-        message: 'Sucesso!',
-        autoDismiss: 1,
-      }));
-      yield put(actions.uploadImageSuccess());
-    }
-  } catch (error) {
-    console.error(error);
-    yield put(error({
-      title: 'Upload de imagem',
-      message: 'Erro!',
+    yield put(success({
+      title: 'Exclusão de imagens',
+      message: 'Sucesso!',
       autoDismiss: 1,
     }));
-    yield put(actions.uploadImageFailure(error));
-  }
-}
-
-export function* deleteS3Image({ payload }) {
-  const { imagesToDelete } = payload;
-  try {
-    const params = {
-      attributes: {
-        Objects: [
-          ...imagesToDelete,
-        ],
-      },
-      action: 'deleteObject',
-      method: 'DELETE',
-    };
-    const response = yield call(services.lambdaS3Service, params);
-    if (response.status === 200) {
-      yield put(success({
-        title: 'Exclusão de imagens',
-        message: 'Sucesso!',
-        autoDismiss: 1,
-      }));
-      yield put(actions.deleteImageSuccess());
-    }
-  } catch (error) {
+    yield put(actions.deleteImageSuccess());
+  } catch (err) {
+    console.error(err);
     yield put(error({
       title: 'Exclusão de imagem',
       message: 'Erro!',
@@ -96,31 +37,31 @@ export function* deleteS3Image({ payload }) {
 
 export function* createProduct({ payload }) {
   try {
-    const { setFormMode, data, imagesToDelete } = payload;
-    if (imagesToDelete.length) {
-      yield put(actions.deleteImageRequest({ imagesToDelete }));
+    const { data, resetForm } = payload;
+    const formData = new FormData();
+    Object.keys(data).filter((item) => (item !== 'images')).forEach((attr) => {
+      formData.append(`${attr}`, data[attr]);
+    });
+    if (data.images && data.images.length) {
+      data.images.forEach((image) => {
+        const { file } = image;
+        const editedFile = new File([file], image.filename, { type: image.content_type });
+
+        formData.append('images[]', editedFile);
+      });
     }
-    const id = generateId(8);
-    const params = {
-      data: {
-        product: { ...data, id },
-        action: 'create',
-      },
-      method: 'POST',
-    };
-    const response = yield call(services.productsApi, { ...params });
-    if (response.status === 200) {
+    const response = yield call(services.createProduct, { data: formData });
+    if (response.status === 201) {
       yield put(success({
         title: 'Criação de produto',
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
-      setFormMode('');
       yield put(actions.createProductSuccess());
-      yield put(actions.fetchProductsRequest());
+      resetForm();
     }
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     yield put(error({
       title: 'Criação de produto',
       message: 'Erro',
@@ -132,18 +73,28 @@ export function* createProduct({ payload }) {
 
 export function* editProduct({ payload }) {
   try {
-    const { data, setFormMode, imagesToDelete } = payload;
+    const {
+      data, resetForm, imagesToDelete, imagesToChange,
+    } = payload;
     if (imagesToDelete.length) {
       yield put(actions.deleteImageRequest({ imagesToDelete }));
     }
-    const params = {
-      data: {
-        product: { ...data },
-        action: 'update',
-      },
-      method: 'PUT',
-    };
-    const response = yield call(services.productsApi, { ...params });
+    if (imagesToChange.length) {
+      yield put(actions.updateImagesOrderRequest({ imagesToChange }));
+    }
+    const formData = new FormData();
+    Object.keys(data).filter((item) => (item !== 'images' && item !== 'model_id' && item !== 'id')).forEach((attr) => {
+      formData.append(`${attr}`, data[attr]);
+    });
+    if (data.images && data.images.length) {
+      data.images.forEach((image) => {
+        const { file } = image;
+        const editedFile = new File([file], image.filename, { type: image.content_type });
+
+        formData.append('images[]', editedFile);
+      });
+    }
+    const response = yield call(services.editProduct, { productId: data.id, data: formData });
     if (response.status === 200) {
       yield put(success({
         title: 'Edição de Produto',
@@ -151,66 +102,82 @@ export function* editProduct({ payload }) {
         autoDismiss: 1,
       }));
       yield put(actions.editProductSuccess());
-      yield put(actions.fetchProductsRequest());
-      setFormMode('');
+      resetForm();
     }
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     yield put(error({
       title: 'Edição de produto',
       message: 'Erro',
       autoDismiss: 1,
     }));
-    yield put(actions.editProductFailure(error));
+    yield put(actions.editProductFailure(err));
   }
 }
 
 export function* deleteProduct({ payload }) {
   try {
-    const { ProductId, imagesToDelete } = payload;
-    if (imagesToDelete.length) {
-      yield put(actions.deleteImageRequest({ imagesToDelete }));
-    }
-    const params = {
-      data: {
-        product: {
-          ProductId,
-        },
-        action: 'delete',
-      },
-      method: 'DELETE',
-    };
-    const response = yield call(services.productsApi, { ...params });
-    if (response.status === 200) {
+    const { productId, updateProductsList } = payload;
+    const response = yield call(services.deleteProduct, { productId });
+    if (response.status === 204) {
       yield put(success({
         title: 'Exclusão de Produto',
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
+      updateProductsList();
       yield put(actions.deleteProductSuccess());
-      yield put(actions.fetchProductsRequest());
     }
-  } catch (error) {
+  } catch (err) {
     yield put(error({
       title: 'Exclusão de produto',
       message: 'Erro',
       autoDismiss: 1,
     }));
-
-    yield put(actions.deleteProductFailure(error));
+    yield put(actions.deleteProductFailure(err));
   }
 }
 
-export function* watchFetchProducts() {
-  yield takeLatest(actions.fetchProductsRequest, fetchProducts);
-}
-
-export function* watchUploadImageToS3() {
-  yield takeLatest(actions.uploadImageRequest, uploadImageToS3);
+export function* updateImagesOrder({ payload }) {
+  try {
+    const { imagesToChange } = payload;
+    const responses = yield all(imagesToChange.filter(
+      ({ newParams: { newFilename, initialFilename } }) => newFilename !== initialFilename,
+    ).map(
+      ({ newParams: { newFilename, productId }, id }) => {
+        const params = {
+          filename: newFilename,
+        };
+        return call(
+          services.updateImage, { imageId: id, productId, params },
+        );
+      },
+    ));
+    if (responses.every((item) => item.status === 200)) {
+      yield put(success({
+        title: 'Atualização de imagens',
+        message: 'Sucesso!',
+        autoDismiss: 1,
+      }));
+    } else {
+      yield put(warning({
+        title: 'Atualização de imagens',
+        message: 'Alguma imagem não foi atualizada com sucesso!',
+        autoDismiss: 1,
+      }));
+    }
+  } catch (e) {
+    console.error(e);
+    yield put(error({
+      title: 'Atualização de imagens',
+      message: 'Erro!',
+      autoDismiss: 1,
+    }));
+  }
 }
 
 export function* watchDeleteImage() {
-  yield takeLatest(actions.deleteImageRequest, deleteS3Image);
+  yield takeLatest(actions.deleteImageRequest, deleteImage);
 }
 
 export function* watchCreateProduct() {
@@ -225,13 +192,16 @@ export function* watchDeleteProduct() {
   yield takeLatest(actions.deleteProductRequest, deleteProduct);
 }
 
+export function* watchUpdateImagesOrder() {
+  yield takeLatest(actions.updateImagesOrderRequest, updateImagesOrder);
+}
+
 export default function* ProductsSaga() {
   yield all([
-    watchFetchProducts(),
-    watchUploadImageToS3(),
     watchDeleteImage(),
     watchCreateProduct(),
     watchEditProduct(),
     watchDeleteProduct(),
+    watchUpdateImagesOrder(),
   ]);
 }

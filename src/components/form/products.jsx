@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  Field, FieldArray, reduxForm, getFormValues,
+  Field,
+  FieldArray,
+  reduxForm,
+  getFormValues,
 } from 'redux-form';
 import { useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 import {
   Form,
   Label,
-  ListGroup,
-  ListGroupItem,
   Button,
   Input as Select,
   Nav,
@@ -20,24 +21,9 @@ import {
 } from 'reactstrap';
 
 import UploadComponent from '../crop/index';
-import { colors, sizeOptions } from '../../utils/constants';
-// import { createProductRequest } from '../../store/products';
 
 const FormSection = styled('div')`
     display: grid;
-`;
-
-const ColorChoiceContainer = styled('div')`
-    display: grid;
-    grid-template-columns: 60% 20% 10%;
-    justify-content: space-around
-`;
-
-const SizeChoiceContainer = styled('div')`
-    display: grid;
-    grid-template-columns: 30% 10%;
-    justify-content: flex-start;
-    position: relative;
 `;
 
 const StyledNavLink = styled(NavLink)`
@@ -55,6 +41,10 @@ const StyledTabPane = styled(TabPane)`
 const Input = styled('input')`
 `;
 
+const ColorInput = ({ input }) => (
+  <Input type="color" {...input} />
+);
+
 const TextInput = ({ input }) => (
   <Input {...input} size="sm" type="text" />
 );
@@ -67,8 +57,27 @@ const TextAreaInput = ({ input }) => <TextArea {...input} />;
 const InputLabel = styled(Label)`
     display: block
 `;
+
+const SizeOptions = [
+  {
+    name: 'Selecione um tamanho',
+    value: '',
+  },
+  {
+    name: 'P',
+    value: 'P',
+  },
+  {
+    name: 'M',
+    value: 'M',
+  },
+  {
+    name: 'G',
+    value: 'G',
+  },
+];
 const RenderSelectInput = ({
-  input, options, disabledOptions, style,
+  input, options, style,
 }) => (
   <Select
     size="sm"
@@ -78,124 +87,16 @@ const RenderSelectInput = ({
   >
     {options.map((item) => (
       <option
-        disabled={disabledOptions && disabledOptions.includes(item)}
-        key={item}
-        value={item}
+        key={item.value}
+        value={item.value}
       >
-        {item}
+        {item.name}
       </option>
     ))}
   </Select>
 );
 
-const renderColorsForm = ({ fields }) => {
-  const value = fields.getAll();
-  const getColors = value && value.map(((item) => item.colorId));
-
-  return (
-    <>
-      <Button
-        style={{
-          position: 'absolute',
-          right: ' 1vw',
-          top: '1vh',
-        }}
-        size="sm"
-        onClick={() => fields.push({
-          colorId: '',
-          quantity: '',
-        })}
-        disabled={value && value.length >= colors.length - 1}
-      >
-        Adicionar cor
-      </Button>
-
-      <ListGroup
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '33% 33% 33%',
-          margin: '0.5vh auto',
-        }}
-      >
-        {fields.map((newColor, fieldIndex) => (
-          <ListGroupItem
-            style={{
-              padding: '1vh 0',
-              border: '1px solid #c6c6c6',
-            }}
-            key={newColor}
-          >
-            <ColorChoiceContainer>
-              <Field
-                options={colors.map((item) => item.id)}
-                disabledOptions={getColors}
-                name={`${newColor}.colorId`}
-                component={RenderSelectInput}
-              />
-              <Field
-                component={TextInput}
-                name={`${newColor}.quantity`}
-              />
-              <Button close onClick={() => fields.remove(fieldIndex)} />
-            </ColorChoiceContainer>
-          </ListGroupItem>
-        ))}
-      </ListGroup>
-    </>
-  );
-};
-
-const renderDetailsForm = ({ fields }) => {
-  const value = fields.getAll();
-  const getSizes = value && value.map(((item) => item.size));
-  return (
-    <>
-      <Button
-        disabled={fields.length >= 3}
-        onClick={() => {
-          fields.push({
-            size: '',
-          });
-        }}
-      >
-        Adicionar Tamanho
-      </Button>
-      <ListGroup>
-        {fields.map((newItem, fieldIndex) => (
-          <ListGroupItem
-            style={{
-              padding: '1vh 0.5vw',
-              margin: '0.5vh 0',
-              border: '1px solid #c6c6c6',
-            }}
-            key={newItem}
-          >
-            <SizeChoiceContainer>
-              <Field
-                component={RenderSelectInput}
-                name={`${newItem}.size`}
-                label="Tamanho"
-                options={sizeOptions}
-                disabledOptions={getSizes}
-              />
-              <Button close onClick={() => fields.remove(fieldIndex)} />
-            </SizeChoiceContainer>
-            {getSizes[fieldIndex]
-                        && (
-                          <FieldArray
-                            name={`${newItem}.colors`}
-                            component={renderColorsForm}
-                          />
-                        )}
-
-          </ListGroupItem>
-        ))}
-      </ListGroup>
-    </>
-  );
-};
-
-const ProductDataSection = () => (
+const ProductDataSection = ({ modelOptions }) => (
   <>
     <InputLabel htmlFor="name">Nome</InputLabel>
     <Field
@@ -206,24 +107,12 @@ const ProductDataSection = () => (
     />
     <InputLabel htmlFor="model">Modelo</InputLabel>
     <Field
-      component={TextInput}
-      name="model"
+      component={RenderSelectInput}
+      name="model_id"
       placeholder="Modelo"
       id="model"
-    />
-    <InputLabel htmlFor="type"> Tipo </InputLabel>
-    <Field
-      component={RenderSelectInput}
-      name="type"
-      id="type"
-      options={[
-        'biquini',
-        'saida',
-        'maiô',
-      ]}
-      style={{
-        width: '12vw',
-      }}
+      options={modelOptions}
+      style={{ width: '15em' }}
     />
     <InputLabel htmlFor="description">Descrição</InputLabel>
     <Field
@@ -231,6 +120,23 @@ const ProductDataSection = () => (
       name="description"
       placeholder="Nome"
       id="description"
+    />
+    <InputLabel htmlFor="size">Tamanho</InputLabel>
+    <Field
+      component={RenderSelectInput}
+      name="size"
+      placeholder="Tamanho"
+      id="size"
+      options={SizeOptions}
+      style={{ width: '15em' }}
+    />
+    <InputLabel htmlFor="color"> Cor </InputLabel>
+    <Field
+      component={ColorInput}
+      name="color"
+      placeholder="Cor"
+      id="color"
+      type="color"
     />
     <InputLabel htmlFor="price">Preço</InputLabel>
     <Field
@@ -242,28 +148,57 @@ const ProductDataSection = () => (
     <InputLabel htmlFor="dealPrice">Promocional</InputLabel>
     <Field
       component={TextInput}
-      name="dealPrice"
+      name="deal_price"
       placeholder="Preço"
       id="dealPrice"
+    />
+    <InputLabel htmlFor="discount">Desconto</InputLabel>
+    <Field
+      component={TextInput}
+      name="discount"
+      placeholder="Preço"
+      id="discount"
+    />
+    <InputLabel htmlFor="in_stock">Em estoque</InputLabel>
+    <Field
+      component={TextInput}
+      name="in_stock"
+      placeholder="Em estoque"
+      id="in_stock"
     />
     <InputLabel htmlFor="isDeal">Marcar como Oferta</InputLabel>
     <Field
       component={Checkbox}
-      name="isDeal"
+      name="is_deal"
       id="isDeal"
+    />
+    <InputLabel htmlFor="enabled">Ativar / Desativar</InputLabel>
+    <Field
+      component={Checkbox}
+      name="enabled"
+      id="enabled"
     />
   </>
 
 );
 
 const ProductForm = (props) => {
-  const { handleSubmit, imagesToDelete, setImagesToDelete } = props;
+  const {
+    handleSubmit,
+    imagesToDelete,
+    setImagesToDelete,
+    models,
+  } = props;
   const state = useSelector((getState) => getState);
   const productsState = state.products;
   const formValues = getFormValues('productsForm')(state);
-  const detailsFormValue = formValues && formValues.details;
+  const productId = formValues && formValues.id;
   const imagesValue = formValues && formValues.images;
-
+  const modelOptions = models.map((model) => ({
+    name: `${model.name} - ${model.ref}`,
+    value: model.id,
+  }));
+  modelOptions.unshift({ name: 'Selecione um modelo', value: '' });
   const [activeTab, toggleTab] = React.useState('1');
   return (
     <Form
@@ -289,22 +224,6 @@ const ProductForm = (props) => {
               Dados do produto
             </StyledNavLink>
           </NavItem>
-          <NavItem>
-            <StyledNavLink
-              onClick={() => toggleTab('2')}
-              selected={activeTab === '2'}
-            >
-              Tamanho e cores
-            </StyledNavLink>
-          </NavItem>
-          <NavItem>
-            <StyledNavLink
-              selected={activeTab === '3'}
-              onClick={() => toggleTab('3')}
-            >
-              Fotos
-            </StyledNavLink>
-          </NavItem>
           <Button
             type="submit"
             style={{
@@ -317,17 +236,7 @@ const ProductForm = (props) => {
         </Nav>
         <TabContent activeTab={activeTab}>
           <StyledTabPane tabId="1">
-            <ProductDataSection />
-          </StyledTabPane>
-          <StyledTabPane tabId="2">
-            <FieldArray
-              name="details"
-              component={renderDetailsForm}
-              value={detailsFormValue}
-            />
-          </StyledTabPane>
-          <StyledTabPane tabId="3">
-            Selecione as imagens
+            <ProductDataSection modelOptions={modelOptions} />
             <FieldArray
               imagesToDelete={imagesToDelete}
               setImagesToDelete={setImagesToDelete}
@@ -336,7 +245,9 @@ const ProductForm = (props) => {
               component={UploadComponent}
               values={imagesValue}
               formValues={formValues}
+              productId={productId}
             />
+
           </StyledTabPane>
         </TabContent>
       </FormSection>
@@ -380,6 +291,7 @@ ProductForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   imagesToDelete: PropTypes.arrayOf(PropTypes.object),
   setImagesToDelete: PropTypes.func,
+  models: PropTypes.bool.isRequired,
 };
 
 ProductForm.defaultProps = {
@@ -393,6 +305,18 @@ TextAreaInput.propTypes = {
     PropTypes.string,
     PropTypes.func,
   ])).isRequired,
+};
+
+ColorInput.propTypes = {
+  input: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+    PropTypes.func,
+  ])).isRequired,
+};
+
+ProductDataSection.propTypes = {
+  modelOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default reduxForm({ form: 'productsForm' })(ProductForm);

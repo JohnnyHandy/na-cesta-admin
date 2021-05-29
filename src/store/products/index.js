@@ -24,6 +24,10 @@ export const deleteProductRequest = createAction('Products/DELETE_PRODUCT_REQUES
 export const deleteProductSuccess = createAction('Products/DELETE_PRODUCT_SUCCESS');
 export const deleteProductFailure = createAction('Products/DELETE_PRODUCT_FAILURE');
 
+export const updateImagesOrderRequest = createAction('Products/UPDATE_IMAGES_REQUEST');
+export const updateImagesOrderSuccess = createAction('Products/UPDATE_IMAGES_ORDER_SUCCESS');
+export const updateImagesOrderFailure = createAction('Products/UPDATE_IMAGES_ORDER_FAILURE');
+
 export const initialState = {
   items: [],
   isFetching: false,

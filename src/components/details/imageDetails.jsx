@@ -46,7 +46,7 @@ const ImageIcon = styled('img')`
 `;
 
 const ImageDetails = ({
-  images, controls, deleteImage, fields,
+  images, controls, deleteImage, moveImage,
 }) => {
   const [showImageIndex, setShowImageIndex] = React.useState(0);
   if (!images || !images[showImageIndex]) {
@@ -60,8 +60,8 @@ const ImageDetails = ({
           maxWidth: '150px',
           margin: '1vh 1vw',
         }}
-        src={images[showImageIndex].src || images[showImageIndex].url}
-        alt={images[showImageIndex].id}
+        src={images[showImageIndex].url}
+        alt={images[showImageIndex].filename}
       />
       {
         controls && (
@@ -70,10 +70,7 @@ const ImageDetails = ({
           color="danger"
           onClick={() => {
             setShowImageIndex(showImageIndex > 1 ? showImageIndex - 1 : 0);
-            deleteImage({
-              objectKey: images[showImageIndex].objectKey,
-              index: showImageIndex,
-            });
+            deleteImage(images[showImageIndex]);
           }}
         >
           Excluir
@@ -86,7 +83,7 @@ const ImageDetails = ({
       <ImageIconsContainer>
         {images.map((item, index, self) => (
           <ImageIconContainer
-            key={item.id || item.objectKey || item.key}
+            key={item.id}
           >
             <ImageIconWrapper
               type="button"
@@ -94,7 +91,7 @@ const ImageDetails = ({
               onClick={() => setShowImageIndex(index)}
             >
               <ImageIcon
-                src={item.src || item.url || item}
+                src={item.url}
                 alt={item.id}
               />
             </ImageIconWrapper>
@@ -103,11 +100,17 @@ const ImageDetails = ({
               <ImageIconControls>
                 <CgArrowLeftR
                   style={{ cursor: 'pointer', display: index === 0 && 'none' }}
-                  onClick={() => fields.move(index, index - 1)}
+                  onClick={() => {
+                    // fields.move(index, index - 1);
+                    moveImage(index, index - 1);
+                  }}
                 />
                 <CgArrowRightR
                   style={{ cursor: 'pointer', display: self.length === index + 1 && 'none' }}
-                  onClick={() => fields.move(index, index + 1)}
+                  onClick={() => {
+                    // fields.move(index, index + 1);
+                    moveImage(index, index + 1);
+                  }}
                 />
               </ImageIconControls>
               )
@@ -124,18 +127,12 @@ ImageDetails.propTypes = {
   images: PropTypes.arrayOf(PropTypes.object).isRequired,
   controls: PropTypes.bool,
   deleteImage: PropTypes.func,
-  fields: PropTypes.objectOf(PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.bool,
-    PropTypes.number,
-    PropTypes.string,
-  ])),
+  moveImage: PropTypes.func.isRequired,
 };
 
 ImageDetails.defaultProps = {
   controls: false,
   deleteImage: () => {},
-  fields: {},
 };
 
 export default ImageDetails;

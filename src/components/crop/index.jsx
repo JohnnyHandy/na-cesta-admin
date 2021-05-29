@@ -2,135 +2,158 @@
 import React, {
   useState, useCallback, useRef, useEffect,
 } from 'react';
+import { change } from 'redux-form';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone-uploader';
-import ReactCrop from 'react-image-crop';
-import { Button } from 'reactstrap';
+import { error } from 'react-notification-system-redux';
 import { useDispatch } from 'react-redux';
 import 'react-dropzone-uploader/dist/styles.css';
 import 'react-image-crop/dist/ReactCrop.css';
 
-import { propTypes } from 'react-notification-system';
 import ImageDetails from '../details/imageDetails';
-import { uploadImageRequest, deleteImageRequest } from '../../store/products';
+import { uploadImageRequest, deleteImageRequest, updateImagesOrderRequest } from '../../store/products';
+import { generateId } from '../../utils/functions';
 
-// Increase pixel density for crop preview quality on retina screens.
-const pixelRatio = window.devicePixelRatio || 1;
-
-// We resize the canvas down when saving on retina devices otherwise the image
-// will be double or triple the preview size.
-function getResizedCanvas(canvas, newWidth, newHeight) {
-  const tmpCanvas = document.createElement('canvas');
-  tmpCanvas.width = newWidth;
-  tmpCanvas.height = newHeight;
-
-  const ctx = tmpCanvas.getContext('2d');
-  ctx.drawImage(
-    canvas,
-    0,
-    0,
-    canvas.width,
-    canvas.height,
-    0,
-    0,
-    newWidth,
-    newHeight,
-  );
-
-  return tmpCanvas;
+function compare(a, b) {
+  function getOrder(filename) {
+    return filename.substr(0, filename.indexOf('-')) * 1;
+  }
+  if (getOrder(a.filename) < getOrder(b.filename)) {
+    return -1;
+  }
+  if (getOrder(a.filename) > getOrder(b.filename)) {
+    return 1;
+  }
+  return 0;
 }
 
 export default function UploadCrop(props) {
   const {
-    fields, values, productsState, setImagesToDelete, imagesToDelete,
+    fields, values, productsState, setImagesToDelete, imagesToDelete, isEditing, productId,
   } = props;
   const dispatch = useDispatch();
-  const [upImg, setUpImg] = useState();
-  const imgRef = useRef(null);
-  const previewCanvasRef = useRef(null);
-  const [crop, setCrop] = useState({ unit: '%', width: 30, aspect: 1 / 1 });
-  const [completedCrop, setCompletedCrop] = useState(null);
+  const imagesValue = values.sort(compare);
+  const moveImage = (oldIndex, newIndex) => {
+    const currentOldIndexImage = imagesValue[oldIndex];
+    const currentOldIndexImageBasename = currentOldIndexImage.filename.substr(currentOldIndexImage.filename.indexOf('-') + 1);
+    const currentNewIndexImage = imagesValue[newIndex];
+    const currentNewIndexImageBasename = currentNewIndexImage.filename.substr(currentNewIndexImage.filename.indexOf('-') + 1);
+    const newCurrentOldIndexFilename = `${newIndex}-${currentOldIndexImageBasename}`;
+    const currentOldIndexImageParams = {
+      ...currentOldIndexImage,
+      filename: newCurrentOldIndexFilename,
+    };
+    if (currentOldIndexImage.stored) {
+      if (currentOldIndexImage.newParams
+        && currentOldIndexImage.newParams.initialFilename === newCurrentOldIndexFilename) {
+        delete currentOldIndexImageParams.newParams;
+      } else {
+        currentOldIndexImageParams.newParams = {
+          newFilename: newCurrentOldIndexFilename,
+          initialFilename:
+          (currentOldIndexImage.newParams && currentOldIndexImage.newParams.initialFilename)
+            ? currentOldIndexImage.newParams.initialFilename
+            : currentOldIndexImage.filename,
+          productId,
+        };
+      }
+    }
+    const newCurrentNewIndexFilename = `${oldIndex}-${currentNewIndexImageBasename}`;
+    const currentNewIndexImageParams = {
+      ...currentNewIndexImage,
+      filename: newCurrentNewIndexFilename,
+    };
+    if (currentNewIndexImage.stored) {
+      if (currentNewIndexImage.newParams
+        && currentNewIndexImage.newParams.initialFilename === newCurrentNewIndexFilename) {
+        delete currentNewIndexImageParams.newParams;
+      } else {
+        currentNewIndexImageParams.newParams = {
+          newFilename: newCurrentNewIndexFilename,
+          initialFilename:
+          (currentNewIndexImage.newParams && currentNewIndexImage.newParams.initialFilename
+            ? currentNewIndexImage.newParams.initialFilename
+            : currentNewIndexImage.filename),
+          productId,
+        };
+      }
+    }
+    const imagesToBeAdded = [currentOldIndexImageParams, currentNewIndexImageParams];
+    let newImagesValue = imagesValue.filter(
+      ((item) => (item.id !== currentOldIndexImage.id && item.id !== currentNewIndexImage.id)),
+    );
+    newImagesValue = newImagesValue.concat(imagesToBeAdded);
+    dispatch(change('productsForm', 'images', newImagesValue));
+  };
   const onSelectFile = (file) => {
     const reader = new FileReader();
-    reader.addEventListener('load', () => setUpImg({
-      result: reader.result,
-      info: file,
-    }));
-    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const img = new Image();
+      img.src = reader.result;
+      img.onload = () => {
+        if (img.width / img.height !== 1) {
+          dispatch(
+            error({
+              title: 'Upload de imagem',
+              message: 'Imagem precisa ter aspecto 1:1',
+              autoDismiss: 1,
+            }),
+          );
+        } else {
+          const newImageOrder = fields.getAll() ? fields.getAll().length + 1 : 1;
+          fields.push({
+            file,
+            filename: `${newImageOrder}-${file.name}`,
+            content_type: file.type,
+            stored: false,
+            url: reader.result,
+            id: generateId(3),
+          });
+        }
+      };
+    };
+    const url = reader.readAsDataURL(file);
   };
-  function generateDownload(previewCanvas, getCrop) {
-    if (!getCrop || !previewCanvas) {
-      return;
-    }
-
-    const canvas = getResizedCanvas(previewCanvas, getCrop.width, getCrop.height);
-
-    canvas.toBlob(
-      (blob) => {
-        const imageFile = new File([blob], upImg.name);
-        dispatch(uploadImageRequest({
-          info: upImg.info,
-          file: imageFile,
-          fields,
-        }));
-        setCompletedCrop(null);
-        setUpImg();
-      },
-      'image/png',
-      1,
-    );
-  }
-
-  const onLoad = useCallback((img) => {
-    imgRef.current = img;
-  }, []);
-  // called every time a file's `status` changes
+  // // called every time a file's `status` changes
   const handleChangeStatus = ({ meta, file }, status) => {
-    // console.log(status, meta, file);
-    onSelectFile(file);
+    if (status === 'done') {
+      onSelectFile(file);
+    }
   };
 
-  useEffect(() => {
-    if (!completedCrop || !previewCanvasRef.current || !imgRef.current) {
-      return;
+  const deleteImage = (image) => {
+    const imagesValues = fields.getAll();
+    const imageIndex = imagesValues.findIndex((item) => item.id === image.id);
+    if (image.stored) {
+      const newImagesToDelete = imagesToDelete.concat({ ...image, productId });
+      setImagesToDelete(newImagesToDelete);
     }
-
-    const image = imgRef.current;
-    const canvas = previewCanvasRef.current;
-    const actualCrop = completedCrop;
-
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = actualCrop.width * pixelRatio;
-    canvas.height = actualCrop.height * pixelRatio;
-
-    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    ctx.imageSmoothingQuality = 'high';
-
-    ctx.drawImage(
-      image,
-      actualCrop.x * scaleX,
-      actualCrop.y * scaleY,
-      actualCrop.width * scaleX,
-      actualCrop.height * scaleY,
-      0,
-      0,
-      actualCrop.width,
-      actualCrop.height,
-    );
-  }, [completedCrop]);
-
-  const deleteImage = (params) => {
-    const { index, objectKey } = params;
-    const newArrayOfImages = imagesToDelete.concat({ Key: objectKey });
-    setImagesToDelete(newArrayOfImages);
-    fields.remove(index);
-  //   dispatch(deleteImageRequest({
-  //   ...params,
-  //   fields,
-  // }))
+    const imageValuesAfterDelete = imagesValues.filter((item) => item.id !== image.id);
+    const imageValuesWithFixedFilenames = imageValuesAfterDelete.map((item, index) => {
+      if (index < imageIndex) {
+        return item;
+      }
+      const basename = item.filename.substr(item.filename.indexOf('-') + 1);
+      const newFilename = `${index}-${basename}`;
+      const params = {
+        ...item,
+        filename: newFilename,
+      };
+      if (item.stored) {
+        if (item.newParams && item.newParams.initialFilename === newFilename) {
+          delete params.newParams;
+        } else {
+          const initialFilename = item.newParams ? item.newParams.initialFilename : item.filename;
+          params.newParams = {
+            newFilename: `${index}-${basename}`,
+            initialFilename,
+            productId,
+          };
+        }
+      }
+      return params;
+    });
+    dispatch(change('productsForm', 'images', imageValuesWithFixedFilenames));
   };
   return (
     <div style={{
@@ -143,11 +166,9 @@ export default function UploadCrop(props) {
         controls
         deleteImage={deleteImage}
         loading={productsState.isFetching}
-        images={values.map((item) => ({
-          src: `https://${process.env.REACT_APP_S3_BUCKET}.s3-${process.env.REACT_APP_REGION}.amazonaws.com/${item.key}`,
-          objectKey: item.key,
-        }))}
+        images={imagesValue}
         fields={fields}
+        moveImage={moveImage}
       />
       <div>
         <Dropzone
@@ -181,60 +202,6 @@ export default function UploadCrop(props) {
           }}
         />
       </div>
-      <ReactCrop
-        src={upImg && upImg.result}
-        onImageLoaded={onLoad}
-        crop={crop}
-        onChange={(c) => setCrop(c)}
-        onComplete={(c) => setCompletedCrop(c)}
-        style={{
-          margin: '1vh 1vw',
-        }}
-        imageStyle={{
-          maxHeight: '50vh',
-        }}
-      />
-      <div>
-        <canvas
-          ref={previewCanvasRef}
-          style={{
-            display: 'none',
-            width: Math.round(completedCrop?.width ?? 0),
-            height: Math.round(completedCrop?.height ?? 0),
-          }}
-        />
-      </div>
-      <p>
-        {/* Note that the download below won't work in this sandbox due to the
-        iframe missing 'allow-downloads'. It's just for your reference. */}
-      </p>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          width: '25vw',
-        }}
-      >
-        <Button
-          type="button"
-          disabled={!completedCrop?.width || !completedCrop?.height}
-          onClick={() => generateDownload(previewCanvasRef.current, completedCrop)}
-        >
-          Confirmar
-        </Button>
-        <Button
-          type="button"
-          color="warning"
-          disabled={!completedCrop?.width || !completedCrop?.height}
-          onClick={() => {
-            setCompletedCrop(null);
-            setUpImg();
-          }}
-        >
-          Cancelar
-        </Button>
-
-      </div>
     </div>
   );
 }
@@ -253,8 +220,10 @@ UploadCrop.propTypes = {
     PropTypes.array,
     PropTypes.object,
   ])),
-  imagesToDelete: PropTypes.arrayOf(propTypes.object),
+  imagesToDelete: PropTypes.arrayOf(PropTypes.object),
   setImagesToDelete: PropTypes.func.isRequired,
+  isEditing: PropTypes.bool.isRequired,
+  productId: PropTypes.number.isRequired,
 };
 
 UploadCrop.defaultProps = {

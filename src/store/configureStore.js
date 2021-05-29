@@ -7,8 +7,12 @@ import { reducer as formReducer } from 'redux-form';
 import { reducer as notifications } from 'react-notification-system-redux';
 import storage from 'redux-persist/lib/storage';
 
-import ProductSagas from './products/sagas';
+import { ModelsReducer } from './models/index';
+import ModelsSagas from './models/sagas';
+
 import { ProductsReducer } from './products/index';
+import ProductSagas from './products/sagas';
+
 import { OrdersReducer } from './orders';
 import OrdersSaga from './orders/sagas';
 
@@ -23,11 +27,13 @@ export function* rootSaga() {
   yield all([
     ProductSagas(),
     OrdersSaga(),
+    ModelsSagas(),
   ]);
 }
 
 const rootReducer = combineReducers({
   products: ProductsReducer,
+  models: ModelsReducer,
   orders: OrdersReducer,
   form: formReducer,
   notifications,

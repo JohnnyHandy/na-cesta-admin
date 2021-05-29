@@ -1,85 +1,187 @@
+/* eslint-disable camelcase */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ListGroup, ListGroupItem, Button } from 'reactstrap';
 import styled from '@emotion/styled';
+import { Button } from 'reactstrap';
+import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 
-const selectedStyle = {
-  backgroundColor: 'blue',
-  color: 'white',
-  cursor: 'pointer',
-};
+import http from '../../utils/http';
+import { deleteProductRequest } from '../../store/products';
 
-const notSelectedStyle = {
-  backgroundColor: 'white',
-  color: 'black',
-  cursor: 'pointer',
-};
-
-const ListContainer = styled('div')`
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center
+const ProductDetailsWrapper = styled('div')` 
+  align-items: center;
+  display: grid;
+  grid-template-columns: 20% 20% 20% 20% 20%;
+  grid-template-rows: 50% 50%;
+  justify-items: center;
 `;
-const ListItemComponent = ({ data, selected, setSelected }) => {
-  if (data.length === 0) {
-    return <h1> Sem produtos cadastrados </h1>;
-  }
+const ProductsWrapper = styled('div')`
+  background-color: darkblue;
+  border: 1px solid black;
+  color: white;
+  padding: 1%;
+  position: relative;
 
-  return data.map((item) => {
-    const id = item.ProductId;
-    return (
-      <ListGroupItem
-        style={
-            selected === id ? selectedStyle : notSelectedStyle
-        }
-        key={id}
-        onClick={() => setSelected(id)}
-      >
-        {item.model}
-      </ListGroupItem>
-    );
-  });
-};
+`;
 
-const List = ({
-  data, selected, setSelected, setFormMode, dispatch, fetchItems,
+const fetchModelProducts = (id) => (
+  http.get(`/models/${id}/products`)
+);
+
+const ProductsList = ({
+  model,
+  openEditProductForm,
+  openCreateProductForm,
+  dispatch,
 }) => {
-  React.useEffect(() => {
-    dispatch(fetchItems());
-  }, [dispatch]);
+  const [products, setProducts] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const fetchProducts = async (id) => {
+    setLoading(true);
+    await fetchModelProducts(id).then((response) => {
+      if (response.status === 200) {
+        setProducts(response.data);
+        setLoading(false);
+      }
+    });
+  };
+  React.useEffect(async () => {
+    if (model) {
+      await fetchProducts(model.id);
+    }
+  }, [model]);
+  if (loading) {
+    <span> Carregando... </span>;
+  }
   return (
-    <ListContainer>
-      <ListGroup
+    <div
+      style={{
+        width: '100%',
+      }}
+    >
+      <div
         style={{
-          width: '100%',
+          display: 'flex', justifyContent: 'space-between', margin: '1em 0', width: '100%',
         }}
       >
-        <ListItemComponent
-          data={data}
-          selected={selected}
-          setSelected={setSelected}
-        />
-      </ListGroup>
-      <Button
-        color="primary"
-        onClick={() => setFormMode('create')}
-      >
-        Criar Produto
-      </Button>
-    </ListContainer>
+        <span>
+          {' '}
+          {model && model.name}
+          {' '}
+        </span>
+        <Button
+          onClick={openCreateProductForm}
+          color="primary"
+        >
+          Criar produto
+        </Button>
+      </div>
+      {
+        products && products.length === 0 ? (
+          <span> Sem produtos cadastrados </span>
+        ) : products.map((product) => (
+          <ProductsWrapper>
+            <div
+              style={{
+                position: 'absolute',
+                right: '0',
+                top: '0',
+              }}
+            >
+              <Button
+                style={{ padding: '0.2em', margin: '0 0.2em' }}
+                size="small"
+                color="warning"
+                onClick={() => {
+                  const { image_url, ...rest } = product;
+                  openEditProductForm({
+                    ...rest,
+                    images: image_url.map((item) => ({
+                      ...item,
+                      stored: true,
+                    })),
+                  });
+                }}
+              >
+                <AiFillEdit />
+              </Button>
+              <Button
+                style={{ padding: '0.2em', margin: '0 0.2em' }}
+                size="small"
+                color="danger"
+                onClick={() => {
+                  const updateProductsList = () => fetchProducts(model.id);
+                  dispatch(deleteProductRequest({ productId: product.id, updateProductsList }));
+                }}
+              >
+                <AiFillDelete />
+              </Button>
+            </div>
+            <span>
+              {product.name}
+            </span>
+            <ProductDetailsWrapper>
+              {
+                product.image_url && product.image_url.length && (
+                  <div style={{ gridRow: '1/-1' }}>
+                    <img style={{ width: '50%', height: '50%' }} src={product.image_url[0].url} alt={product.name} />
+                  </div>
+                )
+              }
+              <div
+                style={{
+                  display: 'flex',
+                }}
+              >
+                <span>
+                  Cor:
+                </span>
+                <div style={{ background: `${product.color}`, height: '20px', width: '20px' }} />
+              </div>
+              <span>
+                Tamanho:
+                {product.size}
+              </span>
+              <span>
+                Oferta:
+                {product.is_deal ? 'Sim' : 'Não'}
+              </span>
+              <span>
+                Desconto:
+                {product.discount}
+              </span>
+              <span>
+                Preço: R$
+                {product.price}
+              </span>
+              <span>
+                Promocional
+                {product.deal_price}
+              </span>
+              <span>
+                Estoque:
+                {product.in_stock}
+              </span>
+              <span>
+                Status:
+                {product.enabled ? 'Ativado' : 'Desativado'}
+              </span>
+
+            </ProductDetailsWrapper>
+          </ProductsWrapper>
+        ))
+      }
+    </div>
   );
 };
 
-List.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
-  selected: PropTypes.string.isRequired,
-  setSelected: PropTypes.func.isRequired,
-  setFormMode: PropTypes.func.isRequired,
+ProductsList.propTypes = {
+  model: PropTypes.objectOf(PropTypes.oneOfType(
+    [PropTypes.number, PropTypes.string],
+  )).isRequired,
+  openEditProductForm: PropTypes.func.isRequired,
+  openCreateProductForm: PropTypes.func.isRequired,
   dispatch: PropTypes.func.isRequired,
-  fetchItems: PropTypes.func.isRequired,
 };
 
-export default List;
+export default ProductsList;

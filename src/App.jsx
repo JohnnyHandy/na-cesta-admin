@@ -10,13 +10,14 @@ import {
 } from 'reactstrap';
 
 import styled from '@emotion/styled';
-import ProductsList from './components/List/products';
+import ModelsList from './components/List/models';
 import OrdersList from './components/List/orders';
-import FormContainer from './container/form';
-import ProductDetails from './components/details/productsDetails';
+import ProductsList from './components/List/products';
+import ProductFormContainer from './container/form/products';
+import ModelFormContainer from './container/form/models';
 import OrderDetails from './components/details/orderDetails';
 import Logo from './assets/useveranologo.png';
-import { fetchProductsRequest } from './store/products';
+import { fetchModelsRequest } from './store/models';
 import { fetchOrdersRequest } from './store/orders';
 
 const Container = styled('div')`
@@ -56,20 +57,30 @@ const FormWrapper = styled('div')`
     background: white;
     padding: 2%
 `;
+const initialState = {
+  formAction: '',
+  formType: '',
+  initialValues: null,
+};
+const reducer = (state, action) => ({ ...state, [action.property]: action.value });
 
 function App() {
   const dispatch = useDispatch();
-  const { products, orders } = useSelector((state) => state);
-  const [selectedProduct, setSelectedProduct] = React.useState('');
+  const [state, dispatchAction] = React.useReducer(reducer, initialState);
+  const { models, orders } = useSelector((reduxState) => reduxState);
+  const [selectedModel, setSelectedModel] = React.useState('');
   const [selectedOrder, setSelectedOrder] = React.useState('');
-  const [formMode, setFormMode] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState('1');
-  const [initialValues, setInitialValues] = React.useState({});
   const [imagesToDelete, setImagesToDelete] = React.useState([]);
 
-  const selectedProductDetails = products.items.find((item) => item.ProductId === selectedProduct);
+  const selectedModelDetails = models.items.find((item) => item.id === selectedModel);
   const selectedOrderDetails = orders.items.find((item) => item.OrderId === selectedOrder);
-  if (formMode) {
+  const resetForm = () => {
+    dispatchAction({ property: 'formAction', value: '' });
+    dispatchAction({ property: 'formType', value: '' });
+    dispatchAction({ property: 'initialValues', value: null });
+  };
+  if (state.formType) {
     return (
       <FormExternalWrapper>
         <FormWrapper>
@@ -78,17 +89,36 @@ function App() {
             color="danger"
             onClick={() => {
               setImagesToDelete([]);
-              setFormMode('');
+              resetForm();
             }}
           />
-          <FormContainer
-            imagesToDelete={imagesToDelete}
-            setImagesToDelete={setImagesToDelete}
-            formMode={formMode}
-            initialValues={initialValues}
-            dispatch={dispatch}
-            setFormMode={setFormMode}
-          />
+          {
+          state.formType === 'product' ? (
+            <ProductFormContainer
+              imagesToDelete={imagesToDelete}
+              setImagesToDelete={setImagesToDelete}
+              formType={state.formType}
+              initialValues={state.initialValues}
+              dispatch={dispatch}
+              selectedModel={selectedModel}
+              models={models.items}
+              resetForm={resetForm}
+              isEditing={state.formAction === 'edit'}
+            />
+          )
+            : (
+              <ModelFormContainer
+                resetForm={resetForm}
+                imagesToDelete={imagesToDelete}
+                setImagesToDelete={setImagesToDelete}
+                formType={state.formType}
+                initialValues={state.initialValues}
+                dispatch={dispatch}
+                selectedModel={selectedModel}
+                models={models.items}
+              />
+            )
+        }
         </FormWrapper>
       </FormExternalWrapper>
     );
@@ -105,7 +135,7 @@ function App() {
         >
           <NavItem onClick={() => setActiveTab('1')}>
             <NavLink>
-              Produtos
+              Modelos
             </NavLink>
           </NavItem>
           <NavItem onClick={() => setActiveTab('2')}>
@@ -119,12 +149,15 @@ function App() {
           }}
         >
           <TabPane tabId="1">
-            <ProductsList
-              fetchItems={fetchProductsRequest}
-              data={products.items}
-              selected={selectedProduct}
-              setSelected={setSelectedProduct}
-              setFormMode={setFormMode}
+            <ModelsList
+              fetchItems={fetchModelsRequest}
+              data={models.items}
+              selected={selectedModel}
+              setSelected={setSelectedModel}
+              openCreateModelForm={() => {
+                dispatchAction({ property: 'formAction', value: 'create' });
+                dispatchAction({ property: 'formType', value: 'model' });
+              }}
               dispatch={dispatch}
             />
           </TabPane>
@@ -143,11 +176,20 @@ function App() {
         {
           activeTab === '1'
             ? (
-              <ProductDetails
+              <ProductsList
                 dispatch={dispatch}
-                setInitialValues={setInitialValues}
-                product={selectedProductDetails}
-                setFormMode={setFormMode}
+                setSelectedModel={setSelectedModel}
+                selectedModel={selectedModel}
+                model={selectedModelDetails}
+                openEditProductForm={(initialValues) => {
+                  dispatchAction({ property: 'initialValues', value: initialValues });
+                  dispatchAction({ property: 'formAction', value: 'edit' });
+                  dispatchAction({ property: 'formType', value: 'product' });
+                }}
+                openCreateProductForm={() => {
+                  dispatchAction({ property: 'formAction', value: 'create' });
+                  dispatchAction({ property: 'formType', value: 'product' });
+                }}
               />
 
             )

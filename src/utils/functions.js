@@ -19,3 +19,13 @@ export function parseISOString(s) {
   const newDate = new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
   return isoFormatDMY(newDate);
 }
+
+export function validURL(str) {
+  const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
+    + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
+    + '((\\d{1,3}\\.){3}\\d{1,3}))' // OR ip (v4) address
+    + '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' // port and path
+    + '(\\?[;&a-z\\d%_.~+=-]*)?' // query string
+    + '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+  return !!pattern.test(str);
+}
