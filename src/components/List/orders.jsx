@@ -3,16 +3,17 @@ import PropTypes from 'prop-types';
 import { ListGroup, ListGroupItem } from 'reactstrap';
 import styled from '@emotion/styled';
 
+import { parseISOString } from '../../utils/functions';
+import { StatusOptions } from '../../utils/constants';
+
 const selectedStyle = {
   backgroundColor: 'blue',
   color: 'white',
-  cursor: 'pointer',
 };
 
 const notSelectedStyle = {
   backgroundColor: 'white',
   color: 'black',
-  cursor: 'pointer',
 };
 
 const ListContainer = styled('div')`
@@ -23,22 +24,44 @@ const ListContainer = styled('div')`
     justify-content: space-between;
     align-items: center
 `;
+
 const ListItemComponent = ({ data, selected, setSelected }) => {
   if (data.length === 0) {
     return <h1> Sem pedidos cadastrados </h1>;
   }
 
   return data.map((item) => {
-    const id = item.OrderId;
+    const {
+      id, status, created_at: createdAt, user,
+    } = item;
+    const style = selected === id ? selectedStyle : notSelectedStyle;
     return (
       <ListGroupItem
-        style={
-            selected === id ? selectedStyle : notSelectedStyle
-        }
+        style={{
+          cursor: 'pointer',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 0.5fr)',
+          ...style,
+        }}
         key={id}
         onClick={() => setSelected(id)}
       >
-        {id}
+        <span>
+          Id:
+          {id}
+        </span>
+        <span>
+          Usuário:
+          {user.name}
+        </span>
+        <span>
+          Status:
+          {StatusOptions.find((statusItem) => statusItem.value === status).label}
+        </span>
+        <span>
+          Data:
+          {parseISOString(createdAt)}
+        </span>
       </ListGroupItem>
     );
   });
@@ -73,6 +96,10 @@ List.propTypes = {
   setSelected: PropTypes.func.isRequired,
   dispatch: PropTypes.func.isRequired,
   fetchItems: PropTypes.func.isRequired,
+};
+
+ListItemComponent.defaultProps = {
+  user: {},
 };
 
 export default List;

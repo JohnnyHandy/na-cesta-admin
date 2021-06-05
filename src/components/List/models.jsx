@@ -38,15 +38,15 @@ const CategoryItem = styled('div')`
 const categoryTypes = [
   {
     label: 'Biquini',
-    value: 0,
-  },
-  {
-    label: 'Maiô',
     value: 1,
   },
   {
-    label: 'Saida',
+    label: 'Maiô',
     value: 2,
+  },
+  {
+    label: 'Saida',
+    value: 3,
   },
 ];
 

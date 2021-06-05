@@ -41,3 +41,18 @@ export const colors = [
 ];
 
 export const sizeOptions = ['', 'P', 'M', 'G'];
+
+export const StatusOptions = [
+  {
+    value: 'finished',
+    label: 'Finalizado',
+  },
+  {
+    value: 'confirmed',
+    label: 'Confirmado',
+  },
+  {
+    value: 'processing',
+    label: 'Processando',
+  },
+];

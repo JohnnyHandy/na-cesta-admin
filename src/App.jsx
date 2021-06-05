@@ -74,7 +74,7 @@ function App() {
   const [imagesToDelete, setImagesToDelete] = React.useState([]);
 
   const selectedModelDetails = models.items.find((item) => item.id === selectedModel);
-  const selectedOrderDetails = orders.items.find((item) => item.OrderId === selectedOrder);
+  const selectedOrderDetails = orders.items.find((item) => item.id === selectedOrder);
   const resetForm = () => {
     dispatchAction({ property: 'formAction', value: '' });
     dispatchAction({ property: 'formType', value: '' });
@@ -133,13 +133,15 @@ function App() {
             width: '100%',
           }}
         >
-          <NavItem onClick={() => setActiveTab('1')}>
+          <NavItem style={{ cursor: 'pointer' }} onClick={() => setActiveTab('1')}>
             <NavLink>
               Modelos
             </NavLink>
           </NavItem>
-          <NavItem onClick={() => setActiveTab('2')}>
-            Pedidos
+          <NavItem style={{ cursor: 'pointer' }} onClick={() => setActiveTab('2')}>
+            <NavLink>
+              Pedidos
+            </NavLink>
           </NavItem>
         </Nav>
         <TabContent
