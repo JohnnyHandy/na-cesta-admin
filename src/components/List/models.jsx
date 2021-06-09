@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 import { ListGroup, ListGroupItem, Button } from 'reactstrap';
 import styled from '@emotion/styled';
 
@@ -72,8 +73,9 @@ const ListItemComponent = ({ data, selected, setSelected }) => {
 };
 
 const List = ({
-  data, selected, setSelected, openCreateModelForm, dispatch, fetchItems,
+  data, selected, setSelected, dispatch, fetchItems,
 }) => {
+  const history = useHistory();
   const [categories, setCategories] = React.useState([]);
   React.useEffect(() => {
     dispatch(fetchItems());
@@ -127,7 +129,7 @@ const List = ({
       </ListGroup>
       <Button
         color="primary"
-        onClick={openCreateModelForm}
+        onClick={() => history.push('/models/new')}
       >
         Criar Modelo
       </Button>
@@ -139,7 +141,6 @@ List.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   selected: PropTypes.string.isRequired,
   setSelected: PropTypes.func.isRequired,
-  openCreateModelForm: PropTypes.func.isRequired,
   dispatch: PropTypes.func.isRequired,
   fetchItems: PropTypes.func.isRequired,
 };

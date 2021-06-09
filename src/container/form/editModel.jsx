@@ -8,7 +8,9 @@ import { createModelRequest } from '../../store/models';
 const FormContainer = (props) => {
   const { dispatch, resetForm } = props;
   const [categories, setCategories] = React.useState([]);
+  const [initialValues, setInitialValues] = React.useState({});
   React.useEffect(async () => {
+    setInitialValues({});
     const getCategories = async () => http.get('/categories').then((res) => {
       if (res.status === 200) {
         setCategories(res.data.map((item) => ({
@@ -24,6 +26,7 @@ const FormContainer = (props) => {
   };
   return (
     <FormComponent
+      initialValues={initialValues}
       categories={categories}
       onSubmit={onSubmit}
       {...props}

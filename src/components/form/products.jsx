@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
   Field,
@@ -11,34 +12,31 @@ import styled from '@emotion/styled';
 import {
   Form,
   Label,
-  Button,
   Input as Select,
-  Nav,
-  NavLink,
-  NavItem,
-  TabContent,
-  TabPane,
+  Button,
 } from 'reactstrap';
 
 import UploadComponent from '../crop/index';
 
-const FormSection = styled('div')`
-    display: grid;
-`;
-
-const StyledNavLink = styled(NavLink)`
-  background:${(props) => (props.selected ? '#0797FF' : 'white')};
-  color:${(props) => (props.selected ? 'white' : '#0797FF')};
-  cursor: pointer
-`;
-
-const StyledTabPane = styled(TabPane)`
-  max-height: 75vh;
+const FormSection = styled(Form)`
+  background: white;
+  border: 2px dashed;
+  display: grid;
   overflow: auto;
-  padding: 1vh 1vw
+  padding: 2em;
+  position:relative;
+`;
+
+const FormExternalWrapper = styled('div')`
+  align-items: center;
+  height: 80%;
+  display: flex;
+  justify-content: space-around;
+  padding: 2vh 2vw;
 `;
 
 const Input = styled('input')`
+  max-width: 15em;
 `;
 
 const ColorInput = ({ input }) => (
@@ -51,6 +49,7 @@ const TextInput = ({ input }) => (
 const Checkbox = ({ input }) => <Input {...input} type="checkbox" />;
 
 const TextArea = styled('textarea')`
+  max-width: 15em;
 `;
 const TextAreaInput = ({ input }) => <TextArea {...input} />;
 
@@ -189,6 +188,7 @@ const ProductForm = (props) => {
     setImagesToDelete,
     models,
   } = props;
+  const history = useHistory();
   const state = useSelector((getState) => getState);
   const productsState = state.products;
   const formValues = getFormValues('productsForm')(state);
@@ -199,59 +199,29 @@ const ProductForm = (props) => {
     value: model.id,
   }));
   modelOptions.unshift({ name: 'Selecione um modelo', value: '' });
-  const [activeTab, toggleTab] = React.useState('1');
   return (
-    <Form
-      style={{
-        padding: '2vh 1vw',
-        height: '90%',
-        width: '90%',
-      }}
-      onSubmit={handleSubmit}
-    >
-      <FormSection>
-        <Nav
-          tabs
-          style={{
-            position: 'relative',
-          }}
-        >
-          <NavItem>
-            <StyledNavLink
-              onClick={() => toggleTab('1')}
-              selected={activeTab === '1'}
-            >
-              Dados do produto
-            </StyledNavLink>
-          </NavItem>
-          <Button
-            type="submit"
-            style={{
-              position: 'absolute',
-              right: '0',
-            }}
-          >
-            Salvar Produto
-          </Button>
-        </Nav>
-        <TabContent activeTab={activeTab}>
-          <StyledTabPane tabId="1">
-            <ProductDataSection modelOptions={modelOptions} />
-            <FieldArray
-              imagesToDelete={imagesToDelete}
-              setImagesToDelete={setImagesToDelete}
-              productsState={productsState}
-              name="images"
-              component={UploadComponent}
-              values={imagesValue}
-              formValues={formValues}
-              productId={productId}
-            />
-
-          </StyledTabPane>
-        </TabContent>
+    <FormExternalWrapper>
+      <FormSection
+        onSubmit={handleSubmit}
+      >
+        <Button
+          close
+          style={{ position: 'absolute', right: '1em', top: '1em' }}
+          onClick={() => history.push('/')}
+        />
+        <ProductDataSection modelOptions={modelOptions} />
+        <FieldArray
+          imagesToDelete={imagesToDelete}
+          setImagesToDelete={setImagesToDelete}
+          productsState={productsState}
+          name="images"
+          component={UploadComponent}
+          values={imagesValue}
+          formValues={formValues}
+          productId={productId}
+        />
       </FormSection>
-    </Form>
+    </FormExternalWrapper>
   );
 };
 

@@ -16,6 +16,9 @@ import ProductSagas from './products/sagas';
 import { OrdersReducer } from './orders';
 import OrdersSaga from './orders/sagas';
 
+import { AuthReducer } from './auth';
+import AuthSaga from './auth/sagas';
+
 const persistConfig = {
   key: 'root',
   storage,
@@ -28,10 +31,12 @@ export function* rootSaga() {
     ProductSagas(),
     OrdersSaga(),
     ModelsSagas(),
+    AuthSaga(),
   ]);
 }
 
 const rootReducer = combineReducers({
+  auth: AuthReducer,
   products: ProductsReducer,
   models: ModelsReducer,
   orders: OrdersReducer,

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 import {
   Field,
   reduxForm,
@@ -11,6 +12,23 @@ import {
   Button,
   Input as Select,
 } from 'reactstrap';
+
+const FormSection = styled(Form)`
+  background: white;
+  border: 2px dashed;
+  display: grid;
+  overflow: auto;
+  padding: 2em;
+  position:relative;
+`;
+
+const FormExternalWrapper = styled('div')`
+  align-items: center;
+  height: 80%;
+  display: flex;
+  justify-content: space-around;
+  padding: 2vh 2vw;
+`;
 
 const Input = styled('input')`
 `;
@@ -53,37 +71,41 @@ const ProductForm = (props) => {
     categories,
     onSubmit,
   } = props;
+  const history = useHistory();
   return (
-    <Form
-      style={{
-        padding: '2vh 1vw',
-        height: '90%',
-        width: '90%',
-      }}
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <InputLabel htmlFor="name">Nome</InputLabel>
-      <Field
-        component={TextInput}
-        name="name"
-        placeholder="Nome"
-        id="name"
-      />
-      <InputLabel htmlFor="model">Categoria</InputLabel>
-      <Field
-        component={RenderSelectInput}
-        name="category_id"
-        placeholder="Categoria"
-        id="category"
-        options={categories}
-        style={{ width: '15em' }}
-      />
-      <Button
-        type="submit"
+    <FormExternalWrapper>
+      <FormSection
+        onSubmit={handleSubmit(onSubmit)}
       >
-        Salvar Modelo
-      </Button>
-    </Form>
+        <Button
+          close
+          style={{ position: 'absolute', right: '1em', top: '1em' }}
+          onClick={() => history.push('/')}
+        />
+        <InputLabel htmlFor="name">Nome</InputLabel>
+        <Field
+          component={TextInput}
+          name="name"
+          placeholder="Nome"
+          id="name"
+        />
+        <InputLabel htmlFor="model">Categoria</InputLabel>
+        <Field
+          component={RenderSelectInput}
+          name="category_id"
+          placeholder="Categoria"
+          id="category"
+          options={categories}
+          style={{ width: '15em' }}
+        />
+        <Button
+          style={{ marginTop: '2em' }}
+          type="submit"
+        >
+          Salvar Modelo
+        </Button>
+      </FormSection>
+    </FormExternalWrapper>
   );
 };
 

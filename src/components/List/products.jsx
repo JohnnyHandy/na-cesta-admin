@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Button } from 'reactstrap';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
@@ -30,10 +31,9 @@ const fetchModelProducts = (id) => (
 
 const ProductsList = ({
   model,
-  openEditProductForm,
-  openCreateProductForm,
   dispatch,
 }) => {
+  const history = useHistory();
   const [products, setProducts] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const fetchProducts = async (id) => {
@@ -70,7 +70,7 @@ const ProductsList = ({
           {' '}
         </span>
         <Button
-          onClick={openCreateProductForm}
+          onClick={() => history.push('/products/new')}
           color="primary"
         >
           Criar produto
@@ -93,14 +93,15 @@ const ProductsList = ({
                 size="small"
                 color="warning"
                 onClick={() => {
-                  const { image_url, ...rest } = product;
-                  openEditProductForm({
-                    ...rest,
-                    images: image_url.map((item) => ({
-                      ...item,
-                      stored: true,
-                    })),
-                  });
+                  history.push(`/products/edit/${product.id}`);
+                  // const { image_url, ...rest } = product;
+                  // openEditProductForm({
+                  //   ...rest,
+                  //   images: image_url.map((item) => ({
+                  //     ...item,
+                  //     stored: true,
+                  //   })),
+                  // });
                 }}
               >
                 <AiFillEdit />
@@ -179,8 +180,6 @@ ProductsList.propTypes = {
   model: PropTypes.objectOf(PropTypes.oneOfType(
     [PropTypes.number, PropTypes.string],
   )).isRequired,
-  openEditProductForm: PropTypes.func.isRequired,
-  openCreateProductForm: PropTypes.func.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
 
