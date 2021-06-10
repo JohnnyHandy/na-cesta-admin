@@ -1,18 +1,42 @@
 /* eslint-disable camelcase */
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
+import http from '../../utils/http';
 import FormComponent from '../../components/form/products';
+import Loading from '../../components/loading';
 import { editProductRequest } from '../../store/products';
+import { fetchModelsRequest } from '../../store/models';
+
+const fetchProductData = (id) => http.get(`/products/${id}`);
 
 const FormContainer = (props) => {
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const history = useHistory();
   const [imagesToDelete, setImagesToDelete] = React.useState([]);
   const [initialValues, setInitialValues] = React.useState({});
-  const {
-    dispatch, resetForm,
-  } = props;
-  React.useEffect(() => {
-    setInitialValues({});
+  const [ready, setRenderReady] = React.useState(false);
+  const modelsItems = useSelector((state) => state.models.items);
+  const resetForm = () => history.push('/');
+  React.useEffect(async () => {
+    dispatch(fetchModelsRequest());
+    await fetchProductData(id).then((res) => {
+      if (res.status === 200) {
+        const { data: { image_url, ...rest } } = res;
+        const productInfo = {
+          ...rest,
+          images: image_url.map((item) => ({
+            ...item,
+            stored: true,
+          })),
+        };
+        setInitialValues(productInfo);
+        setRenderReady(true);
+      }
+    });
   }, []);
   const onSubmit = (data) => {
     let params = {
@@ -38,8 +62,12 @@ const FormContainer = (props) => {
     };
     return dispatch(editProductRequest(params));
   };
+  if (!ready) {
+    return <Loading />;
+  }
   return (
     <FormComponent
+      models={modelsItems}
       imagesToDelete={imagesToDelete}
       setImagesToDelete={setImagesToDelete}
       initialValues={initialValues}

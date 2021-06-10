@@ -1,18 +1,17 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 
 import FormComponent from '../../components/form/products';
 import { createProductRequest } from '../../store/products';
 import { fetchModelsRequest } from '../../store/models';
 
-const FormContainer = (props) => {
+const FormContainer = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [imagesToDelete, setImagesToDelete] = React.useState([]);
-  const {
-    resetForm,
-  } = props;
+  const resetForm = () => history.push('/');
   React.useEffect(() => {
     dispatch(fetchModelsRequest());
   }, []);
@@ -36,10 +35,6 @@ const FormContainer = (props) => {
       models={modelsItems}
     />
   );
-};
-
-FormContainer.propTypes = {
-  resetForm: PropTypes.func.isRequired,
 };
 
 export default FormContainer;

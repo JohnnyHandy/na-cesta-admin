@@ -23,7 +23,9 @@ function App() {
           </Template>
         </Route>
         <Route path="/products/edit/:id">
-          <EditProductForm />
+          <Template>
+            <EditProductForm />
+          </Template>
         </Route>
         <Route path="/models/new">
           <Template>
@@ -31,7 +33,9 @@ function App() {
           </Template>
         </Route>
         <Route path="/models/edit/:id">
-          <EditModelForm />
+          <Template>
+            <EditModelForm />
+          </Template>
         </Route>
       </Switch>
     </BrowserRouter>

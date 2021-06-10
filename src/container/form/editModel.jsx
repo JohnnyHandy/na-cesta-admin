@@ -1,16 +1,21 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
+import { useParams, useHistory } from 'react-router-dom';
 
 import http from '../../utils/http';
 import FormComponent from '../../components/form/models';
-import { createModelRequest } from '../../store/models';
+import Loading from '../../components/loading';
+import { editModelRequest } from '../../store/models';
 
 const FormContainer = (props) => {
-  const { dispatch, resetForm } = props;
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const history = useHistory();
   const [categories, setCategories] = React.useState([]);
   const [initialValues, setInitialValues] = React.useState({});
+  const [ready, setRenderReady] = React.useState(false);
+  const resetForm = () => history.push('/');
   React.useEffect(async () => {
-    setInitialValues({});
     const getCategories = async () => http.get('/categories').then((res) => {
       if (res.status === 200) {
         setCategories(res.data.map((item) => ({
@@ -19,11 +24,26 @@ const FormContainer = (props) => {
         })));
       }
     });
+    const getModelData = async () => http.get(`/models/${id}`).then((res) => {
+      if (res.status === 200) {
+        setInitialValues(res.data);
+        setRenderReady(true);
+      }
+    });
     await getCategories();
+    await getModelData();
   }, []);
   const onSubmit = (data) => {
-    dispatch(createModelRequest({ data, resetForm }));
+    const formattedData = {
+      id: data.id,
+      name: data.name,
+      category_id: data.category_id,
+    };
+    dispatch(editModelRequest({ data: formattedData, resetForm }));
   };
+  if (!ready) {
+    return <Loading />;
+  }
   return (
     <FormComponent
       initialValues={initialValues}
@@ -32,25 +52,6 @@ const FormContainer = (props) => {
       {...props}
     />
   );
-};
-
-FormContainer.propTypes = {
-  dispatch: PropTypes.func.isRequired,
-  initialValues: PropTypes.objectOf(PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.number,
-    PropTypes.bool,
-    PropTypes.string,
-  ])),
-  formMode: PropTypes.string.isRequired,
-  setFormMode: PropTypes.func.isRequired,
-  imagesToDelete: PropTypes.arrayOf(PropTypes.object).isRequired,
-  setImagesToDelete: PropTypes.func.isRequired,
-  resetForm: PropTypes.func.isRequired,
-};
-
-FormContainer.defaultProps = {
-  initialValues: {},
 };
 
 export default FormContainer;

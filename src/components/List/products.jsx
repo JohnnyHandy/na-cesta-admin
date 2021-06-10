@@ -69,12 +69,18 @@ const ProductsList = ({
           {model && model.name}
           {' '}
         </span>
-        <Button
-          onClick={() => history.push('/products/new')}
-          color="primary"
-        >
-          Criar produto
-        </Button>
+        <div>
+          <Button
+            onClick={() => history.push(`/models/edit/${model.id}`)}
+            color="warning"
+          >
+            Editar modelo
+          </Button>
+          <Button>
+            Criar produto
+          </Button>
+
+        </div>
       </div>
       {
         products && products.length === 0 ? (
@@ -94,14 +100,6 @@ const ProductsList = ({
                 color="warning"
                 onClick={() => {
                   history.push(`/products/edit/${product.id}`);
-                  // const { image_url, ...rest } = product;
-                  // openEditProductForm({
-                  //   ...rest,
-                  //   images: image_url.map((item) => ({
-                  //     ...item,
-                  //     stored: true,
-                  //   })),
-                  // });
                 }}
               >
                 <AiFillEdit />

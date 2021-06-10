@@ -63,29 +63,25 @@ export function* createModel({ payload }) {
 
 export function* editModel({ payload }) {
   try {
-    const { data, setFormMode } = payload;
+    const { data, resetForm } = payload;
     const params = {
-      data: {
-        Model: { ...data },
-        action: 'update',
-      },
-      method: 'PUT',
+      ...data,
     };
-    const response = yield call(services.updateModel, { ...params });
+    const response = yield call(services.updateModel, { data: params, id: data.id });
     if (response.status === 200) {
       yield put(success({
-        title: 'Edição de Produto',
+        title: 'Edição de Modelo',
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
       yield put(actions.editModelSuccess());
       yield put(actions.fetchModelsRequest());
-      setFormMode('');
+      resetForm();
     }
   } catch (err) {
     console.error(err);
     yield put(error({
-      title: 'Edição de produto',
+      title: 'Edição de Modelo',
       message: 'Erro',
       autoDismiss: 1,
     }));
