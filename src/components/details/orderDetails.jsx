@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
@@ -7,6 +8,7 @@ import http from '../../utils/http';
 import { parseISOString } from '../../utils/functions';
 import { StatusOptions } from '../../utils/constants';
 import Loading from '../loading/index';
+import { updateCredentialsRequest } from '../../store/auth';
 
 const DetailsSpan = styled('span')`
     align-self: flex-start;
@@ -29,12 +31,14 @@ const fetchOrderDetails = (id) => (
 );
 
 const OrderDetails = ({ order }) => {
+  const dispatch = useDispatch();
   const [loading, setLoading] = React.useState(false);
   const [orderInfo, setOrderInfo] = React.useState({});
   const fetchProducts = async (id) => {
     setLoading(true);
     await fetchOrderDetails(id).then((response) => {
       if (response.status === 200) {
+        dispatch(updateCredentialsRequest(response.headers));
         setOrderInfo(response.data);
         setLoading(false);
       }

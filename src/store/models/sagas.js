@@ -4,6 +4,7 @@ import {
 } from 'redux-saga/effects';
 import { success, error } from 'react-notification-system-redux';
 import { generateId } from '../../utils/functions';
+import { updateCredentialsRequest } from '../auth';
 import * as actions from '.';
 import * as services from './services';
 
@@ -21,6 +22,7 @@ export function* fetchModels({ payload }) {
     };
     const response = yield call(services.fetchModels, { queryParams });
     if (response.status === 200) {
+      yield put(updateCredentialsRequest(response.headers));
       yield put(actions.fetchModelsSuccess(response.data));
     }
   } catch (err) {
@@ -46,7 +48,8 @@ export function* createModel({ payload }) {
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
-      resetForm('');
+      resetForm();
+      yield put(updateCredentialsRequest(response.headers));
       yield put(actions.createModelSuccess());
       yield put(actions.fetchModelsRequest());
     }
@@ -74,6 +77,7 @@ export function* editModel({ payload }) {
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
+      yield put(updateCredentialsRequest(response.headers));
       yield put(actions.editModelSuccess());
       yield put(actions.fetchModelsRequest());
       resetForm();
@@ -108,6 +112,7 @@ export function* deleteModel({ payload }) {
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
+      yield put(updateCredentialsRequest(response.headers));
       yield put(actions.deleteModelSuccess());
       yield put(actions.fetchModelsRequest());
     }

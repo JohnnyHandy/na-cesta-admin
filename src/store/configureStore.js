@@ -6,6 +6,7 @@ import { combineReducers } from 'redux';
 import { reducer as formReducer } from 'redux-form';
 import { reducer as notifications } from 'react-notification-system-redux';
 import storage from 'redux-persist/lib/storage';
+import { addTokenToRequest } from './middlewares';
 
 import { ModelsReducer } from './models/index';
 import ModelsSagas from './models/sagas';
@@ -22,7 +23,7 @@ import AuthSaga from './auth/sagas';
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['form', 'products'],
+  whitelist: ['auth'],
 };
 
 const sagaMiddleware = createSagaMiddleware();
@@ -48,7 +49,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 const config = ({ initialState } = {}) => {
   const store = configureStore({
     reducer: persistedReducer,
-    middleware: [sagaMiddleware],
+    middleware: [sagaMiddleware, addTokenToRequest],
     devTools: process.env.NODE_ENV !== 'production',
     preloadedState: initialState,
   });

@@ -15,6 +15,7 @@ export function* signIn({ payload }) {
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
+      yield put(actions.updateCredentialsRequest(response.headers));
       yield put(actions.SIGN_IN_SUCCESS(response.data.data));
     }
   } catch (err) {
@@ -48,6 +49,21 @@ export function* signOut() {
   }
 }
 
+export function* updateCredentials({ payload }) {
+  try {
+    const headers = payload;
+    if (
+      Object.prototype.hasOwnProperty.call(headers, 'access-token')
+      && typeof headers['access-token'] === 'string'
+      && headers['access-token'].length
+    ) {
+      yield put(actions.updateCredentialsSuccess({ headers }));
+    }
+  } catch (e) {
+    yield put(actions.updateCredentialsFailure(e));
+  }
+}
+
 export function* watchSignIn() {
   yield takeLatest(actions.SIGN_IN_REQUEST, signIn);
 }
@@ -56,9 +72,14 @@ export function* watchSignOut() {
   yield takeLatest(actions.SIGN_OUT_REQUEST, signOut);
 }
 
+export function* watchUpdateCredentials() {
+  yield takeLatest(actions.updateCredentialsRequest, updateCredentials);
+}
+
 export default function* AuthSaga() {
   yield all([
     watchSignIn(),
     watchSignOut(),
+    watchUpdateCredentials(),
   ]);
 }

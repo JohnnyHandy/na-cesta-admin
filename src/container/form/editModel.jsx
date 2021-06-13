@@ -6,6 +6,7 @@ import http from '../../utils/http';
 import FormComponent from '../../components/form/models';
 import Loading from '../../components/loading';
 import { editModelRequest } from '../../store/models';
+import { updateCredentialsRequest } from '../../store/auth';
 
 const FormContainer = (props) => {
   const { id } = useParams();
@@ -18,6 +19,7 @@ const FormContainer = (props) => {
   React.useEffect(async () => {
     const getCategories = async () => http.get('/categories').then((res) => {
       if (res.status === 200) {
+        dispatch(updateCredentialsRequest(res.headers));
         setCategories(res.data.map((item) => ({
           name: item.name,
           value: item.id,
@@ -26,6 +28,7 @@ const FormContainer = (props) => {
     });
     const getModelData = async () => http.get(`/models/${id}`).then((res) => {
       if (res.status === 200) {
+        dispatch(updateCredentialsRequest(res.headers));
         setInitialValues(res.data);
         setRenderReady(true);
       }

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import http from '../../utils/http';
 import FormComponent from '../../components/form/models';
 import { createModelRequest, fetchModelsRequest } from '../../store/models';
+import { updateCredentialsRequest } from '../../store/auth';
 
 const FormContainer = (props) => {
   const { resetForm } = props;
@@ -14,6 +15,7 @@ const FormContainer = (props) => {
     fetchModelsRequest();
     const getCategories = async () => http.get('/categories').then((res) => {
       if (res.status === 200) {
+        dispatch(updateCredentialsRequest(res.headers));
         setCategories(res.data.map((item) => ({
           name: item.name,
           value: item.id,

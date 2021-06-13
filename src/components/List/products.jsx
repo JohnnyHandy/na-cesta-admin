@@ -7,6 +7,7 @@ import { Button } from 'reactstrap';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 
 import http from '../../utils/http';
+import { updateCredentialsRequest } from '../../store/auth';
 import { deleteProductRequest } from '../../store/products';
 
 const ProductDetailsWrapper = styled('div')` 
@@ -40,6 +41,7 @@ const ProductsList = ({
     setLoading(true);
     await fetchModelProducts(id).then((response) => {
       if (response.status === 200) {
+        dispatch(updateCredentialsRequest(response.headers));
         setProducts(response.data);
         setLoading(false);
       }
@@ -71,12 +73,20 @@ const ProductsList = ({
         </span>
         <div>
           <Button
+            style={{
+              margin: '0 0.5em',
+            }}
             onClick={() => history.push(`/models/edit/${model.id}`)}
             color="warning"
           >
             Editar modelo
           </Button>
-          <Button>
+          <Button
+            style={{
+              margin: '0 0.5em',
+            }}
+            onClick={() => history.push('/products/new')}
+          >
             Criar produto
           </Button>
 

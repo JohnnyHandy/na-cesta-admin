@@ -3,6 +3,7 @@ import {
   put, call, takeLatest, all,
 } from 'redux-saga/effects';
 import { success, error, warning } from 'react-notification-system-redux';
+import { updateCredentialsRequest } from '../auth';
 import * as actions from '.';
 import * as services from './services';
 
@@ -16,7 +17,9 @@ export function* deleteImage({ payload }) {
         imageId: image.id,
         productId: image.productId,
       };
-      return call(services.deleteImage, { ...params });
+      const response = call(services.deleteImage, { ...params });
+      put(updateCredentialsRequest(response.headers));
+      return response;
     }));
     yield put(success({
       title: 'Exclusão de imagens',
@@ -57,6 +60,7 @@ export function* createProduct({ payload }) {
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
+      yield put(updateCredentialsRequest(response.headers));
       yield put(actions.createProductSuccess());
       resetForm();
     }
@@ -101,6 +105,7 @@ export function* editProduct({ payload }) {
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
+      yield put(updateCredentialsRequest(response.headers));
       yield put(actions.editProductSuccess());
       resetForm();
     }
@@ -125,6 +130,7 @@ export function* deleteProduct({ payload }) {
         message: 'Sucesso!',
         autoDismiss: 1,
       }));
+      yield put(updateCredentialsRequest(response.headers));
       updateProductsList();
       yield put(actions.deleteProductSuccess());
     }
@@ -148,9 +154,11 @@ export function* updateImagesOrder({ payload }) {
         const params = {
           filename: newFilename,
         };
-        return call(
+        const response = call(
           services.updateImage, { imageId: id, productId, params },
         );
+        put(updateCredentialsRequest(response.headers));
+        return response;
       },
     ));
     if (responses.every((item) => item.status === 200)) {
