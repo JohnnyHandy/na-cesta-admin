@@ -9,6 +9,7 @@ import FormComponent from '../../components/form/products';
 import Loading from '../../components/loading';
 import { editProductRequest } from '../../store/products';
 import { fetchModelsRequest } from '../../store/models';
+import { updateCredentialsRequest } from '../../store/auth';
 
 const fetchProductData = (id) => http.get(`/products/${id}`);
 
@@ -25,6 +26,7 @@ const FormContainer = (props) => {
     dispatch(fetchModelsRequest());
     await fetchProductData(id).then((res) => {
       if (res.status === 200) {
+        dispatch(updateCredentialsRequest(res.headers));
         const { data: { image_url, ...rest } } = res;
         const productInfo = {
           ...rest,

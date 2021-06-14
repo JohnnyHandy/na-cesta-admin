@@ -130,6 +130,7 @@ const List = ({
       <Button
         color="primary"
         onClick={() => history.push('/models/new')}
+        style={{ margin: '1em 0' }}
       >
         Criar Modelo
       </Button>

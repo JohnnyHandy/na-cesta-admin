@@ -72,6 +72,7 @@ const ProductsList = ({
           {' '}
         </span>
         <div>
+          {products && products.length !== 0 && (
           <Button
             style={{
               margin: '0 0.5em',
@@ -81,6 +82,7 @@ const ProductsList = ({
           >
             Editar modelo
           </Button>
+          )}
           <Button
             style={{
               margin: '0 0.5em',
