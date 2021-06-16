@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import http from '../../utils/http';
@@ -8,8 +9,9 @@ import { createModelRequest, fetchModelsRequest } from '../../store/models';
 import { updateCredentialsRequest } from '../../store/auth';
 
 const FormContainer = (props) => {
-  const { resetForm } = props;
   const dispatch = useDispatch();
+  const history = useHistory();
+  const resetForm = () => history.push('/');
   const [categories, setCategories] = React.useState([]);
   React.useEffect(async () => {
     fetchModelsRequest();

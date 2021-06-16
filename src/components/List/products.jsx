@@ -58,20 +58,62 @@ const ProductsList = ({
   return (
     <div
       style={{
+        position: 'relative',
         width: '100%',
       }}
     >
       <div
         style={{
-          display: 'flex', justifyContent: 'space-between', margin: '1em 0', width: '100%',
+          margin: '1em 0', padding: '1em 0', width: '100%',
         }}
       >
-        <span>
+        <span
+          style={{
+            position: 'absolute',
+            top: '0',
+            left: '0',
+          }}
+        >
           {' '}
-          {model && model.name}
+          {model?.name}
           {' '}
         </span>
+        <div
+          style={{
+            display: model ? 'grid' : 'none',
+            gridTemplateColumns: '20% 20% 20%',
+            gridTemplateRows: '50% 50%',
+            width: '100%',
+          }}
+        >
+          <span>
+            Oferta:
+            {model?.is_deal ? 'Sim' : 'Não'}
+          </span>
+          <span>
+            Desconto:
+            {model?.discount}
+          </span>
+          <span>
+            Preço:
+            {model?.price}
+          </span>
+          <span>
+            Preço Promocional:
+            {model?.deal_price}
+          </span>
+          <span>
+            Ativado:
+            {model?.enabled ? 'Ativado' : 'Desativado'}
+          </span>
+        </div>
         <div>
+          <span>Descrição:</span>
+          <span>{model?.description}</span>
+        </div>
+        <div
+          style={{ position: 'absolute', right: '0', top: '0' }}
+        >
           {products && products.length !== 0 && (
           <Button
             style={{
@@ -151,7 +193,7 @@ const ProductsList = ({
               </div>
               <span>
                 Tamanho:
-                {product.size}
+                {product.sizes}
               </span>
               <span>
                 Oferta:
@@ -171,7 +213,15 @@ const ProductsList = ({
               </span>
               <span>
                 Estoque:
-                {product.in_stock}
+                {product.stocks.map((stock) => (
+                  <span>
+                    {' '}
+                    {stock.size}
+                    {' '}
+                    :
+                    {stock.quantity}
+                  </span>
+                ))}
               </span>
               <span>
                 Status:

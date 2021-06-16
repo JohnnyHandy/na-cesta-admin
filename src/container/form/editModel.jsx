@@ -37,12 +37,7 @@ const FormContainer = (props) => {
     await getModelData();
   }, []);
   const onSubmit = (data) => {
-    const formattedData = {
-      id: data.id,
-      name: data.name,
-      category_id: data.category_id,
-    };
-    dispatch(editModelRequest({ data: formattedData, resetForm }));
+    dispatch(editModelRequest({ data, resetForm }));
   };
   if (!ready) {
     return <Loading />;

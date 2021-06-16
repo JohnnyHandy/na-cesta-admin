@@ -43,8 +43,8 @@ const ColorInput = ({ input }) => (
   <Input type="color" {...input} />
 );
 
-const TextInput = ({ input }) => (
-  <Input {...input} size="sm" type="text" />
+const TextInput = ({ input, ...rest }) => (
+  <Input {...rest} {...input} size="sm" type="text" />
 );
 const Checkbox = ({ input }) => <Input {...input} type="checkbox" />;
 
@@ -57,24 +57,6 @@ const InputLabel = styled(Label)`
     display: block
 `;
 
-const SizeOptions = [
-  {
-    name: 'Selecione um tamanho',
-    value: '',
-  },
-  {
-    name: 'P',
-    value: 'P',
-  },
-  {
-    name: 'M',
-    value: 'M',
-  },
-  {
-    name: 'G',
-    value: 'G',
-  },
-];
 const RenderSelectInput = ({
   input, options, style,
 }) => (
@@ -95,7 +77,67 @@ const RenderSelectInput = ({
   </Select>
 );
 
-const ProductDataSection = ({ modelOptions }) => (
+const renderSizesField = ({ fields, setStocksToDelete }) => (
+  <div>
+    {fields.map((newSize, index) => (
+      <div
+        key={newSize}
+        style={{ display: 'flex' }}
+      >
+        <div>
+          <InputLabel>
+            {'Tamanho '}
+
+            {index + 1}
+          </InputLabel>
+          <Field
+            component={TextInput}
+            name={`${newSize}.size`}
+            style={{ marginRight: '1em' }}
+          />
+        </div>
+        <div>
+          <InputLabel>
+            Quantidade
+          </InputLabel>
+          <Field
+            component={TextInput}
+            name={`${newSize}.quantity`}
+            style={{ marginLeft: '1em' }}
+          />
+        </div>
+        <Button
+          close
+          style={{
+            alignSelf: 'flex-end',
+            background: 'red',
+            color: 'white',
+            marginLeft: '1em',
+            padding: '0.5em',
+          }}
+          onClick={() => {
+            const value = fields.get(index);
+            if (value.stored) {
+              setStocksToDelete((sizes) => [...sizes, value]);
+            }
+            fields.remove(index);
+          }}
+        />
+      </div>
+    ))}
+    <Button
+      onClick={() => fields.push({
+        size: '',
+        quantity: '',
+      })}
+      style={{ marginTop: '1em' }}
+    >
+      Adicionar Tamanho
+    </Button>
+  </div>
+);
+
+const ProductDataSection = ({ modelOptions, setStocksToDelete }) => (
   <>
     <InputLabel htmlFor="name">Nome</InputLabel>
     <Field
@@ -120,15 +162,6 @@ const ProductDataSection = ({ modelOptions }) => (
       placeholder="Nome"
       id="description"
     />
-    <InputLabel htmlFor="size">Tamanho</InputLabel>
-    <Field
-      component={RenderSelectInput}
-      name="size"
-      placeholder="Tamanho"
-      id="size"
-      options={SizeOptions}
-      style={{ width: '15em' }}
-    />
     <InputLabel htmlFor="color"> Cor </InputLabel>
     <Field
       component={ColorInput}
@@ -137,6 +170,12 @@ const ProductDataSection = ({ modelOptions }) => (
       id="color"
       type="color"
     />
+    <InputLabel> Tamanhos </InputLabel>
+    <FieldArray
+      component={renderSizesField}
+      name="stocks_attributes"
+      setStocksToDelete={setStocksToDelete}
+    />
     <InputLabel htmlFor="price">Preço</InputLabel>
     <Field
       component={TextInput}
@@ -144,26 +183,19 @@ const ProductDataSection = ({ modelOptions }) => (
       placeholder="Preço"
       id="price"
     />
-    <InputLabel htmlFor="dealPrice">Promocional</InputLabel>
+    <InputLabel htmlFor="dealPrice">Preço Promocional</InputLabel>
     <Field
       component={TextInput}
       name="deal_price"
-      placeholder="Preço"
+      placeholder="Preço Promocional"
       id="dealPrice"
     />
     <InputLabel htmlFor="discount">Desconto</InputLabel>
     <Field
       component={TextInput}
       name="discount"
-      placeholder="Preço"
+      placeholder="Desconto"
       id="discount"
-    />
-    <InputLabel htmlFor="in_stock">Em estoque</InputLabel>
-    <Field
-      component={TextInput}
-      name="in_stock"
-      placeholder="Em estoque"
-      id="in_stock"
     />
     <InputLabel htmlFor="isDeal">Marcar como Oferta</InputLabel>
     <Field
@@ -187,6 +219,7 @@ const ProductForm = (props) => {
     imagesToDelete,
     setImagesToDelete,
     models,
+    ...rest
   } = props;
   const history = useHistory();
   const state = useSelector((getState) => getState);
@@ -209,7 +242,7 @@ const ProductForm = (props) => {
           style={{ position: 'absolute', right: '1em', top: '1em' }}
           onClick={() => history.push('/')}
         />
-        <ProductDataSection modelOptions={modelOptions} />
+        <ProductDataSection modelOptions={modelOptions} {...rest} />
         <FieldArray
           imagesToDelete={imagesToDelete}
           setImagesToDelete={setImagesToDelete}
@@ -220,6 +253,7 @@ const ProductForm = (props) => {
           formValues={formValues}
           productId={productId}
         />
+        <Button style={{ justifySelf: 'center', margin: '1em 0' }} type="submit"> Salvar produto </Button>
       </FormSection>
     </FormExternalWrapper>
   );
@@ -287,6 +321,7 @@ ColorInput.propTypes = {
 
 ProductDataSection.propTypes = {
   modelOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setStocksToDelete: PropTypes.func.isRequired,
 };
 
 export default reduxForm({ form: 'productsForm' })(ProductForm);

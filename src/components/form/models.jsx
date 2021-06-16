@@ -89,6 +89,15 @@ const ProductForm = (props) => {
           placeholder="Nome"
           id="name"
         />
+
+        <InputLabel htmlFor="description">Descrição</InputLabel>
+        <Field
+          component={TextAreaInput}
+          name="description"
+          placeholder="Nome"
+          id="description"
+        />
+
         <InputLabel htmlFor="model">Categoria</InputLabel>
         <Field
           component={RenderSelectInput}
@@ -97,6 +106,39 @@ const ProductForm = (props) => {
           id="category"
           options={categories}
           style={{ width: '15em' }}
+        />
+        <InputLabel htmlFor="price">Preço</InputLabel>
+        <Field
+          component={TextInput}
+          name="price"
+          placeholder="Preço"
+          id="price"
+        />
+        <InputLabel htmlFor="dealPrice">Preço Promocional</InputLabel>
+        <Field
+          component={TextInput}
+          name="deal_price"
+          placeholder="Preço Promocional"
+          id="dealPrice"
+        />
+        <InputLabel htmlFor="discount">Desconto</InputLabel>
+        <Field
+          component={TextInput}
+          name="discount"
+          placeholder="Desconto"
+          id="discount"
+        />
+        <InputLabel htmlFor="isDeal">Marcar como Oferta</InputLabel>
+        <Field
+          component={Checkbox}
+          name="is_deal"
+          id="isDeal"
+        />
+        <InputLabel htmlFor="enabled">Ativar / Desativar</InputLabel>
+        <Field
+          component={Checkbox}
+          name="enabled"
+          id="enabled"
         />
         <Button
           style={{ marginTop: '2em' }}

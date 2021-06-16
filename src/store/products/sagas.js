@@ -38,11 +38,40 @@ export function* deleteImage({ payload }) {
   }
 }
 
+export function* deleteStock({ payload }) {
+  const { stocksToDelete } = payload;
+  try {
+    yield all(stocksToDelete.map((stock) => {
+      const params = {
+        stockId: stock.id,
+        productId: stock.productId,
+      };
+      const response = call(services.deleteStock, { ...params });
+      put(updateCredentialsRequest(response.headers));
+      return response;
+    }));
+    yield put(success({
+      title: 'Exclusão de estoques',
+      message: 'Sucesso!',
+      autoDismiss: 1,
+    }));
+    yield put(actions.deleteImageSuccess());
+  } catch (err) {
+    console.error(err);
+    yield put(error({
+      title: 'Exclusão de Estoque',
+      message: 'Erro!',
+      autoDismiss: 1,
+    }));
+    yield put(actions.deleteImageFailure());
+  }
+}
+
 export function* createProduct({ payload }) {
   try {
     const { data, resetForm } = payload;
     const formData = new FormData();
-    Object.keys(data).filter((item) => (item !== 'images')).forEach((attr) => {
+    Object.keys(data).filter((item) => (item !== 'images' && item !== 'stocks_attributes')).forEach((attr) => {
       formData.append(`${attr}`, data[attr]);
     });
     if (data.images && data.images.length) {
@@ -51,6 +80,12 @@ export function* createProduct({ payload }) {
         const editedFile = new File([file], image.filename, { type: image.content_type });
 
         formData.append('images[]', editedFile);
+      });
+    }
+    if (data.stocks_attributes && data.stocks_attributes.length) {
+      data.stocks_attributes.forEach((item, index) => {
+        formData.append(`stocks_attributes[${index}][size]`, item.size);
+        formData.append(`stocks_attributes[${index}][quantity]`, item.quantity);
       });
     }
     const response = yield call(services.createProduct, { data: formData });
@@ -78,7 +113,7 @@ export function* createProduct({ payload }) {
 export function* editProduct({ payload }) {
   try {
     const {
-      data, resetForm, imagesToDelete, imagesToChange,
+      data, resetForm, imagesToDelete, imagesToChange, stocksToDelete, stocksToChange,
     } = payload;
     if (imagesToDelete.length) {
       yield put(actions.deleteImageRequest({ imagesToDelete }));
@@ -86,8 +121,14 @@ export function* editProduct({ payload }) {
     if (imagesToChange.length) {
       yield put(actions.updateImagesOrderRequest({ imagesToChange }));
     }
+    if (stocksToDelete.length) {
+      yield put(actions.deleteStockRequest({ stocksToDelete }));
+    }
+    if (stocksToChange.length) {
+      yield put(actions.updateStockRequest({ stocksToChange }));
+    }
     const formData = new FormData();
-    Object.keys(data).filter((item) => (item !== 'images' && item !== 'model_id' && item !== 'id')).forEach((attr) => {
+    Object.keys(data).filter((item) => (item !== 'images' && item !== 'model_id' && item !== 'id' && item !== 'stocks_attributes')).forEach((attr) => {
       formData.append(`${attr}`, data[attr]);
     });
     if (data.images && data.images.length) {
@@ -96,6 +137,13 @@ export function* editProduct({ payload }) {
         const editedFile = new File([file], image.filename, { type: image.content_type });
 
         formData.append('images[]', editedFile);
+      });
+    }
+    if (data.stocks_attributes && data.stocks_attributes.length) {
+      data.stocks_attributes.forEach((item, index) => {
+        formData.append(`stocks_attributes[${index}][id]`, item.id);
+        formData.append(`stocks_attributes[${index}][size]`, item.size);
+        formData.append(`stocks_attributes[${index}][quantity]`, item.quantity);
       });
     }
     const response = yield call(services.editProduct, { productId: data.id, data: formData });
@@ -184,6 +232,47 @@ export function* updateImagesOrder({ payload }) {
   }
 }
 
+export function* updateStocks({ payload }) {
+  try {
+    const { stocksToChange } = payload;
+    const responses = yield all(stocksToChange.map(
+      ({
+        size, quantity, id, productId,
+      }) => {
+        const params = {
+          size,
+          quantity,
+        };
+        const response = call(
+          services.updateStock, { stockId: id, productId, params },
+        );
+        put(updateCredentialsRequest(response.headers));
+        return response;
+      },
+    ));
+    if (responses.every((item) => item.status === 200)) {
+      yield put(success({
+        title: 'Atualização de estoques',
+        message: 'Sucesso!',
+        autoDismiss: 1,
+      }));
+    } else {
+      yield put(warning({
+        title: 'Atualização de estoques',
+        message: 'Alguma imagem não foi atualizada com sucesso!',
+        autoDismiss: 1,
+      }));
+    }
+  } catch (e) {
+    console.error(e);
+    yield put(error({
+      title: 'Atualização de estoques',
+      message: 'Erro!',
+      autoDismiss: 1,
+    }));
+  }
+}
+
 export function* watchDeleteImage() {
   yield takeLatest(actions.deleteImageRequest, deleteImage);
 }
@@ -204,6 +293,14 @@ export function* watchUpdateImagesOrder() {
   yield takeLatest(actions.updateImagesOrderRequest, updateImagesOrder);
 }
 
+export function* watchDeleteStock() {
+  yield takeLatest(actions.deleteStockRequest, deleteStock);
+}
+
+export function* watchUpdateStock() {
+  yield takeLatest(actions.updateStockRequest, updateStocks);
+}
+
 export default function* ProductsSaga() {
   yield all([
     watchDeleteImage(),
@@ -211,5 +308,7 @@ export default function* ProductsSaga() {
     watchEditProduct(),
     watchDeleteProduct(),
     watchUpdateImagesOrder(),
+    watchDeleteStock(),
+    watchUpdateStock(),
   ]);
 }

@@ -4,10 +4,6 @@ export const fetchProductsRequest = createAction('Products/FETCH_PRODUCTS_REQUES
 export const fetchProductsSuccess = createAction('Products/FETCH_PRODUCTS_SUCCESS');
 export const fetchProductsFailure = createAction('Products/FETCH_PRODUCTS_FAILURE');
 
-export const uploadImageRequest = createAction('Products/UPLOAD_IMAGE_REQUEST');
-export const uploadImageSuccess = createAction('Products/UPLOAD_IMAGE_SUCCESS');
-export const uploadImageFailure = createAction('Products/UPLOAD_IMAGE_FAILURE');
-
 export const deleteImageRequest = createAction('Products/DELETE_IMAGE_REQUEST');
 export const deleteImageSuccess = createAction('Products/DELETE_IMAGE_SUCCESS');
 export const deleteImageFailure = createAction('Products/DELETE_IMAGE_FAILURE');
@@ -28,14 +24,18 @@ export const updateImagesOrderRequest = createAction('Products/UPDATE_IMAGES_REQ
 export const updateImagesOrderSuccess = createAction('Products/UPDATE_IMAGES_ORDER_SUCCESS');
 export const updateImagesOrderFailure = createAction('Products/UPDATE_IMAGES_ORDER_FAILURE');
 
+export const deleteStockRequest = createAction('Products/DELETE_STOCK_REQUEST');
+export const deleteStockSuccess = createAction('Products/DELETE_STOCK_SUCCESS');
+export const deleteStockFailure = createAction('Products/DELETE_STOCK_FAILURE');
+
+export const updateStockRequest = createAction('Products/UPDATE_STOCK_REQUEST');
+export const updateStockSuccess = createAction('Products/UPDATE_STOCK_SUCCESS');
+export const updateStockFailure = createAction('Products/UPDATE_STOCK_FAILURE');
+
 export const initialState = {
   items: [],
   isFetching: false,
   error: null,
-  images: {
-    isFetching: false,
-    error: null,
-  },
 };
 
 export const ProductsReducer = createReducer(initialState, {
@@ -53,51 +53,19 @@ export const ProductsReducer = createReducer(initialState, {
     isFetching: false,
     error: action.payload,
   }),
-  [uploadImageRequest]: (state) => ({
-    ...state,
-    images: {
-      ...state.images,
-      isFetching: true,
-    },
-  }),
-  [uploadImageSuccess]: (state) => ({
-    ...state,
-    images: {
-      ...state.images,
-      isFetching: false,
-      error: null,
-    },
-  }),
-  [uploadImageFailure]: (state, action) => ({
-    ...state,
-    images: {
-      ...state.images,
-      isFetching: false,
-      error: action.payload,
-    },
-  }),
   [deleteImageRequest]: (state) => ({
     ...state,
-    images: {
-      ...state.images,
-      isFetching: true,
-      error: null,
-    },
+    isFetching: true,
+    error: null,
   }),
   [deleteImageSuccess]: (state) => ({
     ...state,
-    images: {
-      ...state.images,
-      isFetching: false,
-    },
+    isFetching: false,
   }),
   [deleteImageFailure]: (state, action) => ({
     ...state,
-    images: {
-      ...state.images,
-      isFetching: false,
-      error: action.payload,
-    },
+    isFetching: false,
+    error: action.payload,
   }),
   [createProductRequest]: (state) => ({
     ...state,
@@ -137,6 +105,32 @@ export const ProductsReducer = createReducer(initialState, {
     isFetching: false,
   }),
   [deleteProductFailure]: (state, action) => ({
+    ...state,
+    isFetching: false,
+    error: action.payload,
+  }),
+  [deleteStockRequest]: (state) => ({
+    ...state,
+    isFetching: true,
+  }),
+  [deleteStockSuccess]: (state) => ({
+    ...state,
+    isFetching: false,
+  }),
+  [deleteStockFailure]: (state, action) => ({
+    ...state,
+    isFetching: false,
+    error: action.payload,
+  }),
+  [updateStockRequest]: (state) => ({
+    ...state,
+    isFetching: true,
+  }),
+  [updateStockSuccess]: (state) => ({
+    ...state,
+    isFetching: false,
+  }),
+  [updateStockFailure]: (state, action) => ({
     ...state,
     isFetching: false,
     error: action.payload,
