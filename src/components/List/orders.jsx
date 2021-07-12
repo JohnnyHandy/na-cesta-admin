@@ -1,7 +1,12 @@
+/* eslint-disable camelcase */
+/** @jsxRuntime classic */
+/** @jsx jsx */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ListGroup, ListGroupItem } from 'reactstrap';
 import styled from '@emotion/styled';
+import { css, jsx } from '@emotion/core';
 
 import { parseISOString } from '../../utils/functions';
 import { StatusOptions } from '../../utils/constants';
@@ -25,6 +30,10 @@ const ListContainer = styled('div')`
     align-items: center
 `;
 
+const spanCss = css`
+  font-weight: bold;
+`;
+
 const ListItemComponent = ({ data, selected, setSelected }) => {
   if (data.length === 0) {
     return <h1> Sem pedidos cadastrados </h1>;
@@ -32,7 +41,7 @@ const ListItemComponent = ({ data, selected, setSelected }) => {
 
   return data.map((item) => {
     const {
-      id, status, created_at: createdAt, user,
+      id, status, created_at: createdAt, user, ref,
     } = item;
     const style = selected === id ? selectedStyle : notSelectedStyle;
     return (
@@ -46,22 +55,34 @@ const ListItemComponent = ({ data, selected, setSelected }) => {
         key={id}
         onClick={() => setSelected(id)}
       >
-        <span>
-          Id:
-          {id}
+        <span
+          style={{
+            gridColumn: '1 / -1',
+            fontSize: '1.5em',
+            marginBottom: '1em',
+          }}
+        >
+          Referência:
+          {ref}
         </span>
-        <span>
-          Usuário:
-          {user.name}
-        </span>
-        <span>
-          Status:
-          {StatusOptions.find((statusItem) => statusItem.value === status).label}
-        </span>
-        <span>
-          Data:
-          {parseISOString(createdAt)}
-        </span>
+        <div>
+          <span css={spanCss}>Id:</span>
+          <span>{id}</span>
+        </div>
+        <div>
+          <span css={spanCss}>Nome:</span>
+          <span>{user.name}</span>
+        </div>
+        <div>
+          <span css={spanCss}>Status:</span>
+          <span>
+            {StatusOptions.find((statusItem) => statusItem.value === status).label}
+          </span>
+        </div>
+        <div>
+          <span css={spanCss}>Data:</span>
+          <span>{parseISOString(createdAt)}</span>
+        </div>
       </ListGroupItem>
     );
   });
@@ -92,7 +113,7 @@ const List = ({
 
 List.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
-  selected: PropTypes.string.isRequired,
+  selected: PropTypes.number.isRequired,
   setSelected: PropTypes.func.isRequired,
   dispatch: PropTypes.func.isRequired,
   fetchItems: PropTypes.func.isRequired,

@@ -6,6 +6,9 @@ import { useHistory } from 'react-router-dom';
 import { ListGroup, ListGroupItem, Button } from 'reactstrap';
 import styled from '@emotion/styled';
 
+import { fetchModelsRequest } from '../../store/models';
+import Loading from '../loading';
+
 const selectedStyle = {
   backgroundColor: 'blue',
   color: 'white',
@@ -73,15 +76,15 @@ const ListItemComponent = ({ data, selected, setSelected }) => {
 };
 
 const List = ({
-  data, selected, setSelected, dispatch, fetchItems,
+  data, selected, setSelected, dispatch, loading,
 }) => {
   const history = useHistory();
   const [categories, setCategories] = React.useState([]);
   React.useEffect(() => {
-    dispatch(fetchItems());
+    dispatch(fetchModelsRequest());
   }, [dispatch]);
   React.useEffect(() => {
-    dispatch(fetchItems(
+    dispatch(fetchModelsRequest(
       {
         filters: {
           'q[category_id_in]': categories,
@@ -91,12 +94,16 @@ const List = ({
   }, [categories]);
   return (
     <ListContainer>
-      <div
-        style={{
-          display: 'flex',
-        }}
-      >
-        {
+      {loading
+        ? <Loading />
+        : (
+          <>
+            <div
+              style={{
+                display: 'flex',
+              }}
+            >
+              {
         categoryTypes.map((item) => (
           <CategoryItem
             id={item.value}
@@ -115,35 +122,39 @@ const List = ({
           </CategoryItem>
         ))
       }
-      </div>
-      <ListGroup
-        style={{
-          width: '100%',
-        }}
-      >
-        <ListItemComponent
-          data={data}
-          selected={selected}
-          setSelected={setSelected}
-        />
-      </ListGroup>
-      <Button
-        color="primary"
-        onClick={() => history.push('/models/new')}
-        style={{ margin: '1em 0' }}
-      >
-        Criar Modelo
-      </Button>
+            </div>
+            <ListGroup
+              style={{
+                width: '100%',
+                overflow: 'auto',
+                maxHeight: '60vh',
+              }}
+            >
+              <ListItemComponent
+                data={data}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            </ListGroup>
+            <Button
+              color="primary"
+              onClick={() => history.push('/models/new')}
+              style={{ margin: '1em 0' }}
+            >
+              Criar Modelo
+            </Button>
+          </>
+        )}
     </ListContainer>
   );
 };
 
 List.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
-  selected: PropTypes.string.isRequired,
+  selected: PropTypes.number.isRequired,
   setSelected: PropTypes.func.isRequired,
   dispatch: PropTypes.func.isRequired,
-  fetchItems: PropTypes.func.isRequired,
+  loading: PropTypes.bool.isRequired,
 };
 
 export default List;

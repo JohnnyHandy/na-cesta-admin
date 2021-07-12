@@ -2,7 +2,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
-import PropTypes from 'prop-types';
 
 import http from '../../utils/http';
 import FormComponent from '../../components/form/products';
@@ -93,16 +92,10 @@ const FormContainer = (props) => {
       setStocksToDelete={setStocksToDelete}
       initialValues={initialValues}
       onSubmit={onSubmit}
+      dispatch={dispatch}
       {...props}
     />
   );
-};
-
-FormContainer.propTypes = {
-  dispatch: PropTypes.func.isRequired,
-  isEditing: PropTypes.bool.isRequired,
-  imagesToDelete: PropTypes.arrayOf(PropTypes.object).isRequired,
-  resetForm: PropTypes.func.isRequired,
 };
 
 export default FormContainer;

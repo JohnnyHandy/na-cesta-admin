@@ -1,9 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import {
+  BrowserRouter, Switch, Route, Redirect,
+} from 'react-router-dom';
 
 import Template from './template';
-import Dashboard from './container/dashboard/index';
+import OrdersContainer from './container/orders/OrdersContainer';
+import ModelsContainer from './container/models/ModelsContainer';
 import CreateProductForm from './container/form/newProducts';
 import EditProductForm from './container/form/editProduct';
 import CreateModelForm from './container/form/newModel';
@@ -25,8 +28,16 @@ function App() {
           : (
             <>
               <Route exact path="/">
+                <Redirect to="/models" />
+              </Route>
+              <Route exact path="/models">
                 <Template>
-                  <Dashboard />
+                  <ModelsContainer />
+                </Template>
+              </Route>
+              <Route exact path="/orders">
+                <Template>
+                  <OrdersContainer />
                 </Template>
               </Route>
               <Route path="/products/new">

@@ -45,11 +45,13 @@ const OrderDetails = ({ order }) => {
     });
   };
   React.useEffect(async () => {
-    if (order) {
+    if (Object.keys(order).length) {
       await fetchProducts(order.id);
     }
   }, [order]);
-
+  if (Object.keys(order).length === 0) {
+    return <h2> Selecione um pedido </h2>;
+  }
   if (loading) {
     return (
       <Loading />
@@ -83,7 +85,7 @@ const OrderDetails = ({ order }) => {
         </DetailsSpan>
         <DetailsSpan>
           Preço final:
-          {orderInfo.total}
+          {`R$ ${orderInfo.total}`}
         </DetailsSpan>
         <DetailsSpan>
           Status:
@@ -166,8 +168,9 @@ const OrderDetails = ({ order }) => {
         }}
       >
         {
-          orderInfo.order_items && orderInfo.order_items.map((product) => (
-            <ProductDetailsWrapper>
+          orderInfo.order_items && orderInfo.order_items.map((product, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <ProductDetailsWrapper key={`${product.name}-${index}`}>
               <DetailsSpan>
                 {product.name}
               </DetailsSpan>
@@ -209,12 +212,12 @@ const OrderDetails = ({ order }) => {
                 {product.discount}
               </DetailsSpan>
               <DetailsSpan>
-                Preço: R$
-                {product.price}
+                Preço:
+                {`R$ ${product.subtotal}`}
               </DetailsSpan>
               <DetailsSpan>
-                Promocional: R$
-                {product.deal_price}
+                Promocional:
+                {`R$ ${product.deal_price || ''}`}
               </DetailsSpan>
               <DetailsSpan>
                 Status:
@@ -251,23 +254,7 @@ OrderDetails.propTypes = {
 };
 
 OrderDetails.defaultProps = {
-  order: {
-    UserId: '',
-    created_at: '',
-    total: 0,
-    products: [{}],
-    status: '',
-    ProductIds: [''],
-    orderDetails: {
-      discount: 0,
-      paymentMethod: '',
-      deliverCost: 0,
-      discountCode: '',
-      deliverMethod: '',
-      totalCost: 0,
-    },
-    OrderId: '',
-  },
+  order: {},
 };
 
 export default OrderDetails;

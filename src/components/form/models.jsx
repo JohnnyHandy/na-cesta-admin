@@ -14,27 +14,28 @@ import {
 } from 'reactstrap';
 
 const FormSection = styled(Form)`
-  background: white;
-  border: 2px dashed;
   display: grid;
+  height: 100%;
   overflow: auto;
   padding: 2em;
-  position:relative;
 `;
 
 const FormExternalWrapper = styled('div')`
-  align-items: center;
-  height: 80%;
-  display: flex;
-  justify-content: space-around;
-  padding: 2vh 2vw;
+  background: white;  
+  height: 100%;
+  position:relative;
+`;
+
+const InputLabel = styled(Label)`
+    display: block;
+    margin-top: 1em;
 `;
 
 const Input = styled('input')`
 `;
 
-const TextInput = ({ input }) => (
-  <Input {...input} size="sm" type="text" />
+const TextInput = ({ input, ...rest }) => (
+  <Input {...rest} {...input} size="sm" type="text" />
 );
 const Checkbox = ({ input }) => <Input {...input} type="checkbox" />;
 
@@ -42,9 +43,6 @@ const TextArea = styled('textarea')`
 `;
 const TextAreaInput = ({ input }) => <TextArea {...input} />;
 
-const InputLabel = styled(Label)`
-    display: block
-`;
 const RenderSelectInput = ({
   input, options, style,
 }) => (
@@ -82,66 +80,80 @@ const ProductForm = (props) => {
           style={{ position: 'absolute', right: '1em', top: '1em' }}
           onClick={() => history.push('/')}
         />
-        <InputLabel htmlFor="name">Nome</InputLabel>
-        <Field
-          component={TextInput}
-          name="name"
-          placeholder="Nome"
-          id="name"
-        />
+        <div
+          style={{
+            display: 'grid',
+            width: 'fit-content',
+          }}
+        >
+          <InputLabel htmlFor="name">Nome</InputLabel>
+          <Field
+            component={TextInput}
+            name="name"
+            placeholder="Nome"
+            id="name"
+          />
 
-        <InputLabel htmlFor="description">Descrição</InputLabel>
-        <Field
-          component={TextAreaInput}
-          name="description"
-          placeholder="Nome"
-          id="description"
-        />
+          <InputLabel htmlFor="description">Descrição</InputLabel>
+          <Field
+            component={TextAreaInput}
+            name="description"
+            placeholder="Nome"
+            id="description"
+          />
 
-        <InputLabel htmlFor="model">Categoria</InputLabel>
-        <Field
-          component={RenderSelectInput}
-          name="category_id"
-          placeholder="Categoria"
-          id="category"
-          options={categories}
-          style={{ width: '15em' }}
-        />
-        <InputLabel htmlFor="price">Preço</InputLabel>
-        <Field
-          component={TextInput}
-          name="price"
-          placeholder="Preço"
-          id="price"
-        />
-        <InputLabel htmlFor="dealPrice">Preço Promocional</InputLabel>
-        <Field
-          component={TextInput}
-          name="deal_price"
-          placeholder="Preço Promocional"
-          id="dealPrice"
-        />
-        <InputLabel htmlFor="discount">Desconto</InputLabel>
-        <Field
-          component={TextInput}
-          name="discount"
-          placeholder="Desconto"
-          id="discount"
-        />
-        <InputLabel htmlFor="isDeal">Marcar como Oferta</InputLabel>
-        <Field
-          component={Checkbox}
-          name="is_deal"
-          id="isDeal"
-        />
-        <InputLabel htmlFor="enabled">Ativar / Desativar</InputLabel>
-        <Field
-          component={Checkbox}
-          name="enabled"
-          id="enabled"
-        />
+          <InputLabel htmlFor="model">Categoria</InputLabel>
+          <Field
+            component={RenderSelectInput}
+            name="category_id"
+            placeholder="Categoria"
+            id="category"
+            options={categories}
+            style={{ width: '15em' }}
+          />
+          <InputLabel htmlFor="price">Preço</InputLabel>
+          <Field
+            component={TextInput}
+            name="price"
+            placeholder="Preço"
+            id="price"
+          />
+          <InputLabel htmlFor="dealPrice">Preço Promocional</InputLabel>
+          <Field
+            component={TextInput}
+            name="deal_price"
+            placeholder="Preço Promocional"
+            id="dealPrice"
+          />
+          <InputLabel htmlFor="discount">Desconto</InputLabel>
+          <Field
+            component={TextInput}
+            name="discount"
+            placeholder="Desconto"
+            id="discount"
+          />
+          <InputLabel htmlFor="isDeal">Marcar como Oferta</InputLabel>
+          <Field
+            component={Checkbox}
+            name="is_deal"
+            id="isDeal"
+          />
+          <InputLabel htmlFor="enabled">Ativar / Desativar</InputLabel>
+          <Field
+            component={Checkbox}
+            name="enabled"
+            id="enabled"
+          />
+
+        </div>
         <Button
-          style={{ marginTop: '2em' }}
+          style={{
+            marginTop: '2em',
+            alignSelf: 'flex-end',
+            justifySelf: 'center',
+            height: 'fit-content',
+            width: 'fit-content',
+          }}
           type="submit"
         >
           Salvar Modelo

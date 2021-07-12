@@ -1,42 +1,113 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import styled from '@emotion/styled';
+import { AiOutlineBlock, AiOutlineInbox } from 'react-icons/ai';
 
+import Logo from '../assets/useveranologo.png';
 import { SIGN_OUT_SUCCESS } from '../store/auth';
 
 const Container = styled('div')`
   background-color: burlywood;
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  position: relative;
 `;
 
 const ChildrenContainer = styled('div')`
-  height: 100%;
-  margin: auto;
-  width: 100%;
+  flex-grow: 1;
+  overflow: hidden;
+  padding: 1em;
 `;
+
+const MenuItem = styled('div')`
+  align-items: center;
+  background: ${(props) => (props.highlighted ? 'lightgray' : 'initial')};
+  color: ${(props) => (props.highlighted ? 'white' : 'initial')};
+  cursor: pointer;
+  display: flex;
+  padding: 0.5em;
+  font-size: 1.2em;
+  &: hover {
+    color: ${(props) => (props.highlighted ? 'white' : 'lightgray')};
+
+  }
+`;
+const MenuItemLabel = styled('span')`
+  margin-left: 0.5em;
+`;
+
+const menuOptions = [
+  {
+    label: 'Modelos',
+    path: '/models',
+    icon: <AiOutlineBlock />,
+  },
+  {
+    label: 'Pedidos',
+    path: '/orders',
+    icon: <AiOutlineInbox />,
+  },
+];
 
 const Template = ({ children }) => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const { isLoggedIn } = useSelector((state) => state.auth);
   return (
     <Container>
-      { isLoggedIn && (
-      <Button
-        style={{
-          position: 'absolute', right: '1em', top: '1em', zIndex: '1',
-        }}
-        onClick={() => dispatch(SIGN_OUT_SUCCESS())}
+      <div
+        style={{ background: 'white', width: '100%', position: 'relative' }}
       >
-        Logout
-      </Button>
-      )}
-      <ChildrenContainer>
-        {children}
-      </ChildrenContainer>
+        <img style={{ width: '10vw' }} src={Logo} alt="logo" />
+        {isLoggedIn && (
+        <Button
+          style={{
+            position: 'absolute', right: '1em', top: '1em', zIndex: '1',
+          }}
+          onClick={() => dispatch(SIGN_OUT_SUCCESS())}
+        >
+          Logout
+        </Button>
+        )}
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexGrow: 1,
+        }}
+      >
+        {isLoggedIn && (
+        <div
+          style={{ background: 'white', width: '10vw' }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {
+              menuOptions.map((option) => (
+                <MenuItem
+                  highlighted={history.location.pathname === option.path}
+                  key={option.label}
+                  onClick={() => history.push(option.path)}
+                >
+                  {option.icon}
+                  <MenuItemLabel>{option.label}</MenuItemLabel>
+                </MenuItem>
+              ))
+            }
+          </div>
+        </div>
+        )}
+        <ChildrenContainer>
+          {children}
+        </ChildrenContainer>
+      </div>
     </Container>
   );
 };

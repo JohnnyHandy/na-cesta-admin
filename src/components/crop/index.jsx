@@ -11,7 +11,6 @@ import 'react-dropzone-uploader/dist/styles.css';
 import 'react-image-crop/dist/ReactCrop.css';
 
 import ImageDetails from '../details/imageDetails';
-import { uploadImageRequest, deleteImageRequest, updateImagesOrderRequest } from '../../store/products';
 import { generateId } from '../../utils/functions';
 
 function compare(a, b) {
@@ -29,7 +28,7 @@ function compare(a, b) {
 
 export default function UploadCrop(props) {
   const {
-    fields, values, productsState, setImagesToDelete, imagesToDelete, isEditing, productId,
+    fields, values, productsState, setImagesToDelete, imagesToDelete, productId,
   } = props;
   const dispatch = useDispatch();
   const imagesValue = values.sort(compare);
@@ -160,6 +159,7 @@ export default function UploadCrop(props) {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      alignSelf: 'center',
     }}
     >
       <ImageDetails
@@ -170,7 +170,7 @@ export default function UploadCrop(props) {
         fields={fields}
         moveImage={moveImage}
       />
-      <div>
+      <div style={{ width: '-webkit-fill-available' }}>
         <Dropzone
           PreviewComponent={null}
           accept="image/*"
@@ -197,7 +197,6 @@ export default function UploadCrop(props) {
               cursor: 'pointer',
             },
             dropzone: {
-              width: '50vw',
             },
           }}
         />
@@ -222,8 +221,7 @@ UploadCrop.propTypes = {
   ])),
   imagesToDelete: PropTypes.arrayOf(PropTypes.object),
   setImagesToDelete: PropTypes.func.isRequired,
-  isEditing: PropTypes.bool.isRequired,
-  productId: PropTypes.number.isRequired,
+  productId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 UploadCrop.defaultProps = {
@@ -235,4 +233,5 @@ UploadCrop.defaultProps = {
     images: {},
   },
   imagesToDelete: [],
+  productId: '',
 };

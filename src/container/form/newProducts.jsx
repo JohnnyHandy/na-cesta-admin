@@ -1,16 +1,17 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import FormComponent from '../../components/form/products';
 import { createProductRequest } from '../../store/products';
 import { fetchModelsRequest } from '../../store/models';
 
 const FormContainer = () => {
+  const [nullValues, setNullValues] = React.useState([]);
+  const location = useLocation();
   const dispatch = useDispatch();
   const history = useHistory();
-  const [imagesToDelete, setImagesToDelete] = React.useState([]);
   const resetForm = () => history.push('/');
   React.useEffect(() => {
     dispatch(fetchModelsRequest());
@@ -27,12 +28,20 @@ const FormContainer = () => {
     };
     return dispatch(createProductRequest(params));
   };
+  const additionalProps = {};
+  if (location?.state?.modelId) {
+    additionalProps.initialValues = {
+      model_id: `${location.state.modelId}`,
+    };
+  }
   return (
     <FormComponent
-      imagesToDelete={imagesToDelete}
-      setImagesToDelete={setImagesToDelete}
       onSubmit={onSubmit}
       models={modelsItems}
+      dispatch={dispatch}
+      setNullValues={setNullValues}
+      nullValues={nullValues}
+      {...additionalProps}
     />
   );
 };

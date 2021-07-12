@@ -22,48 +22,121 @@ const FormSection = styled(Form)`
   background: white;
   border: 2px dashed;
   display: grid;
+  grid-template-columns: 50% 50%;
   overflow: auto;
   padding: 2em;
   position:relative;
 `;
 
 const FormExternalWrapper = styled('div')`
-  align-items: center;
-  height: 80%;
-  display: flex;
-  justify-content: space-around;
-  padding: 2vh 2vw;
 `;
 
 const Input = styled('input')`
   max-width: 15em;
+`;
+const InputLabel = styled(Label)`
+    display: block;
+    margin-top: 1em;
 `;
 
 const ColorInput = ({ input }) => (
   <Input type="color" {...input} />
 );
 
-const TextInput = ({ input, ...rest }) => (
-  <Input {...rest} {...input} size="sm" type="text" />
+const TextInput = ({
+  input, likeModel = false, setNullValues, ...rest
+}) => (
+  <div style={{ display: 'flex', alignItems: 'center' }}>
+    <Input {...rest} {...input} bsSize="sm" type="text" />
+    {likeModel && (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <Input
+        style={{ margin: '0 1em' }}
+        type="checkbox"
+        onChange={(e) => {
+          if (e.target.checked) {
+            setNullValues((nullValues) => nullValues.concat(input.name));
+          } else {
+            setNullValues((nullValues) => nullValues.filter((value) => value !== input.name));
+          }
+        }}
+      />
+      <span>
+        {`Usar ${rest.placeholder.toLowerCase()} do modelo`}
+      </span>
+    </div>
+    )}
+  </div>
 );
-const Checkbox = ({ input }) => <Input {...input} type="checkbox" />;
+const Checkbox = ({
+  input, likeModel, setNullValues, ...rest
+}) => (
+  (
+    <div>
+      <Input {...rest} {...input} type="checkbox" />
+      {likeModel && (
+      <>
+        <Input
+          style={{ margin: '0 1em' }}
+          type="checkbox"
+          onChange={(e) => {
+            if (e.target.checked) {
+              setNullValues((nullValues) => nullValues.concat(input.name));
+            } else {
+              setNullValues((nullValues) => nullValues.filter((value) => value !== input.name));
+            }
+          }}
+        />
+        <span>
+          {`Usar ${rest.placeholder.toLowerCase()} do modelo`}
+        </span>
+      </>
+      )}
+    </div>
+  )
+);
 
 const TextArea = styled('textarea')`
   max-width: 15em;
 `;
-const TextAreaInput = ({ input }) => <TextArea {...input} />;
+const TextAreaInput = ({
+  input, likeModel, setNullValues, ...rest
+}) => (
+  <div
+    style={{ display: 'flex', alignItems: 'center' }}
+  >
+    <TextArea {...rest} {...input} />
+    {likeModel && (
+    <div
+      style={{ display: 'flex', alignItems: 'center' }}
+    >
+      <Input
+        style={{ margin: '0 1em' }}
+        type="checkbox"
+        onChange={(e) => {
+          if (e.target.checked) {
+            setNullValues((nullValues) => nullValues.concat(input.name));
+          } else {
+            setNullValues((nullValues) => nullValues.filter((value) => value !== input.name));
+          }
+        }}
+      />
+      <span>
+        {`Usar ${rest.placeholder.toLowerCase()} do modelo`}
+      </span>
+    </div>
+    )}
+  </div>
 
-const InputLabel = styled(Label)`
-    display: block
-`;
+);
 
 const RenderSelectInput = ({
-  input, options, style,
+  input, options, ...rest
 }) => (
   <Select
     size="sm"
     type="select"
-    style={style}
+    {...rest}
     {...input}
   >
     {options.map((item) => (
@@ -137,8 +210,10 @@ const renderSizesField = ({ fields, setStocksToDelete }) => (
   </div>
 );
 
-const ProductDataSection = ({ modelOptions, setStocksToDelete }) => (
-  <>
+const ProductDataSection = ({
+  modelOptions, setStocksToDelete, setNullValues, nullValues,
+}) => (
+  <div style={{ display: 'grid' }}>
     <InputLabel htmlFor="name">Nome</InputLabel>
     <Field
       component={TextInput}
@@ -159,8 +234,11 @@ const ProductDataSection = ({ modelOptions, setStocksToDelete }) => (
     <Field
       component={TextAreaInput}
       name="description"
-      placeholder="Nome"
+      placeholder="Descrição"
       id="description"
+      setNullValues={setNullValues}
+      likeModel
+      disabled={nullValues.includes('description')}
     />
     <InputLabel htmlFor="color"> Cor </InputLabel>
     <Field
@@ -169,6 +247,9 @@ const ProductDataSection = ({ modelOptions, setStocksToDelete }) => (
       placeholder="Cor"
       id="color"
       type="color"
+      setNullValues={setNullValues}
+      likeModel
+      disabled={nullValues.includes('color')}
     />
     <InputLabel> Tamanhos </InputLabel>
     <FieldArray
@@ -182,6 +263,9 @@ const ProductDataSection = ({ modelOptions, setStocksToDelete }) => (
       name="price"
       placeholder="Preço"
       id="price"
+      setNullValues={setNullValues}
+      disabled={nullValues.includes('price')}
+      likeModel
     />
     <InputLabel htmlFor="dealPrice">Preço Promocional</InputLabel>
     <Field
@@ -189,6 +273,9 @@ const ProductDataSection = ({ modelOptions, setStocksToDelete }) => (
       name="deal_price"
       placeholder="Preço Promocional"
       id="dealPrice"
+      setNullValues={setNullValues}
+      disabled={nullValues.includes('deal_price')}
+      likeModel
     />
     <InputLabel htmlFor="discount">Desconto</InputLabel>
     <Field
@@ -196,12 +283,19 @@ const ProductDataSection = ({ modelOptions, setStocksToDelete }) => (
       name="discount"
       placeholder="Desconto"
       id="discount"
+      setNullValues={setNullValues}
+      likeModel
+      disabled={nullValues.includes('discount')}
     />
     <InputLabel htmlFor="isDeal">Marcar como Oferta</InputLabel>
     <Field
       component={Checkbox}
       name="is_deal"
       id="isDeal"
+      placeholder="Oferta"
+      setNullValues={setNullValues}
+      likeModel
+      disabled={nullValues.includes('is_deal')}
     />
     <InputLabel htmlFor="enabled">Ativar / Desativar</InputLabel>
     <Field
@@ -209,7 +303,7 @@ const ProductDataSection = ({ modelOptions, setStocksToDelete }) => (
       name="enabled"
       id="enabled"
     />
-  </>
+  </div>
 
 );
 
@@ -242,7 +336,11 @@ const ProductForm = (props) => {
           style={{ position: 'absolute', right: '1em', top: '1em' }}
           onClick={() => history.push('/')}
         />
-        <ProductDataSection modelOptions={modelOptions} {...rest} />
+        <ProductDataSection
+          formValues={formValues}
+          modelOptions={modelOptions}
+          {...rest}
+        />
         <FieldArray
           imagesToDelete={imagesToDelete}
           setImagesToDelete={setImagesToDelete}
@@ -253,7 +351,7 @@ const ProductForm = (props) => {
           formValues={formValues}
           productId={productId}
         />
-        <Button style={{ justifySelf: 'center', margin: '1em 0' }} type="submit"> Salvar produto </Button>
+        <Button style={{ justifySelf: 'center', margin: '1em 0', gridColumn: '1/-1' }} type="submit"> Salvar produto </Button>
       </FormSection>
     </FormExternalWrapper>
   );
@@ -264,6 +362,19 @@ TextInput.propTypes = {
     PropTypes.func,
     PropTypes.string,
   ])).isRequired,
+  likeModel: PropTypes.bool,
+  dispatch: PropTypes.func.isRequired,
+  meta: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.string,
+    PropTypes.bool,
+  ])).isRequired,
+  setNullValues: PropTypes.func,
+};
+
+TextInput.defaultProps = {
+  likeModel: false,
+  setNullValues: () => {},
 };
 
 RenderSelectInput.propTypes = {
@@ -272,15 +383,7 @@ RenderSelectInput.propTypes = {
     PropTypes.string,
     PropTypes.func,
   ])).isRequired,
-  options: PropTypes.arrayOf(PropTypes.string).isRequired,
-  disabledOptions: PropTypes.arrayOf(PropTypes.string),
-  style: PropTypes.objectOf(PropTypes.oneOf([
-    PropTypes.string,
-  ])),
-};
-RenderSelectInput.defaultProps = {
-  style: {},
-  disabledOptions: [],
+  options: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 Checkbox.propTypes = {
@@ -289,13 +392,20 @@ Checkbox.propTypes = {
     PropTypes.string,
     PropTypes.func,
   ])).isRequired,
+  likeModel: PropTypes.bool,
+  setNullValues: PropTypes.func,
+};
+
+Checkbox.defaultProps = {
+  likeModel: false,
+  setNullValues: () => {},
 };
 
 ProductForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   imagesToDelete: PropTypes.arrayOf(PropTypes.object),
   setImagesToDelete: PropTypes.func,
-  models: PropTypes.bool.isRequired,
+  models: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 ProductForm.defaultProps = {
@@ -309,6 +419,13 @@ TextAreaInput.propTypes = {
     PropTypes.string,
     PropTypes.func,
   ])).isRequired,
+  likeModel: PropTypes.bool,
+  setNullValues: PropTypes.func,
+};
+
+TextAreaInput.defaultProps = {
+  likeModel: false,
+  setNullValues: () => {},
 };
 
 ColorInput.propTypes = {
@@ -321,7 +438,14 @@ ColorInput.propTypes = {
 
 ProductDataSection.propTypes = {
   modelOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
-  setStocksToDelete: PropTypes.func.isRequired,
+  setStocksToDelete: PropTypes.func,
+  nullValues: PropTypes.arrayOf(PropTypes.string).isRequired,
+  setNullValues: PropTypes.func,
+};
+
+ProductDataSection.defaultProps = {
+  setStocksToDelete: () => {},
+  setNullValues: () => {},
 };
 
 export default reduxForm({ form: 'productsForm' })(ProductForm);
