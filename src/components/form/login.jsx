@@ -31,6 +31,7 @@ const FormComponent = (props) => {
   return (
     <FormExternalWrapper>
       <Container>
+        <h1> Login </h1>
         <Form onSubmit={handleSubmit(onSubmit)} style={{ display: 'grid' }}>
           <Field
             name="email"

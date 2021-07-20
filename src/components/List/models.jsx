@@ -5,8 +5,9 @@ import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 import { ListGroup, ListGroupItem, Button } from 'reactstrap';
 import styled from '@emotion/styled';
-
+import Select from 'react-select';
 import { fetchModelsRequest } from '../../store/models';
+import { categoryTypes, nbaTeams } from '../../utils/constants';
 import Loading from '../loading';
 
 const selectedStyle = {
@@ -39,21 +40,6 @@ const CategoryItem = styled('div')`
   padding: 0.5em 1em;
 `;
 
-const categoryTypes = [
-  {
-    label: 'Biquini',
-    value: 1,
-  },
-  {
-    label: 'Maiô',
-    value: 2,
-  },
-  {
-    label: 'Saida',
-    value: 3,
-  },
-];
-
 const ListItemComponent = ({ data, selected, setSelected }) => {
   if (data.length === 0) {
     return <h1> Sem Modelos cadastrados </h1>;
@@ -80,6 +66,7 @@ const List = ({
 }) => {
   const history = useHistory();
   const [categories, setCategories] = React.useState([]);
+  const [team, setTeam] = React.useState();
   React.useEffect(() => {
     dispatch(fetchModelsRequest());
   }, [dispatch]);
@@ -88,10 +75,11 @@ const List = ({
       {
         filters: {
           'q[category_id_in]': categories,
+          'q[team_in]': [team?.value ? team.value : ''],
         },
       },
     ));
-  }, [categories]);
+  }, [categories, team]);
   return (
     <ListContainer>
       {loading
@@ -104,24 +92,36 @@ const List = ({
               }}
             >
               {
-        categoryTypes.map((item) => (
-          <CategoryItem
-            id={item.value}
-            selected={categories.includes(item.value)}
-            onClick={() => {
-              let newCategories = categories;
-              if (categories.includes(item.value)) {
-                newCategories = categories.filter((categoryItem) => (categoryItem !== item.value));
-              } else {
-                newCategories = categories.concat(item.value);
+                Object.keys(categoryTypes).map((item) => (
+                  <CategoryItem
+                    id={item}
+                    selected={categories.includes(categoryTypes[item])}
+                    onClick={() => {
+                      let newCategories = categories;
+                      if (categories.includes(categoryTypes[item])) {
+                        newCategories = categories.filter(
+                          (categoryItem) => (categoryItem !== categoryTypes[item]),
+                        );
+                      } else {
+                        newCategories = categories.concat(categoryTypes[item]);
+                      }
+                      setCategories(newCategories);
+                    }}
+                  >
+                    {item}
+                  </CategoryItem>
+                ))
               }
-              setCategories(newCategories);
-            }}
-          >
-            {item.label}
-          </CategoryItem>
-        ))
-      }
+            </div>
+            <div style={{ width: 'inherit' }}>
+              <Select
+                value={team}
+                isClearable
+                onChange={(value) => setTeam(value)}
+                placeholder="Filtrar por time"
+                options={Object.keys(nbaTeams)
+                  .map((item) => ({ label: item, value: nbaTeams[item] }))}
+              />
             </div>
             <ListGroup
               style={{

@@ -6,7 +6,7 @@ import { Button } from 'reactstrap';
 import styled from '@emotion/styled';
 import { AiOutlineBlock, AiOutlineInbox } from 'react-icons/ai';
 
-import Logo from '../assets/useveranologo.png';
+import Logo from '../assets/na-cesta-logo.png';
 import { SIGN_OUT_SUCCESS } from '../store/auth';
 
 const Container = styled('div')`

@@ -76,7 +76,7 @@ const ListItemComponent = ({ data, selected, setSelected }) => {
         <div>
           <span css={spanCss}>Status:</span>
           <span>
-            {StatusOptions.find((statusItem) => statusItem.value === status).label}
+            {StatusOptions.find((statusItem) => statusItem.value === status)?.label}
           </span>
         </div>
         <div>

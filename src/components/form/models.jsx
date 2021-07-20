@@ -13,6 +13,8 @@ import {
   Input as Select,
 } from 'reactstrap';
 
+import { nbaTeams } from '../../utils/constants';
+
 const FormSection = styled(Form)`
   display: grid;
   height: 100%;
@@ -62,8 +64,12 @@ const RenderSelectInput = ({
     ))}
   </Select>
 );
+const teamsOptions = Object.keys(nbaTeams).map((team) => ({
+  name: team,
+  value: nbaTeams[team],
+}));
 
-const ProductForm = (props) => {
+const ModelForm = (props) => {
   const {
     handleSubmit,
     categories,
@@ -102,13 +108,22 @@ const ProductForm = (props) => {
             id="description"
           />
 
-          <InputLabel htmlFor="model">Categoria</InputLabel>
+          <InputLabel htmlFor="category">Categoria</InputLabel>
           <Field
             component={RenderSelectInput}
             name="category_id"
             placeholder="Categoria"
             id="category"
             options={categories}
+            style={{ width: '15em' }}
+          />
+          <InputLabel htmlFor="team">Time</InputLabel>
+          <Field
+            component={RenderSelectInput}
+            name="team"
+            placeholder="Time"
+            id="team"
+            options={teamsOptions}
             style={{ width: '15em' }}
           />
           <InputLabel htmlFor="price">Preço</InputLabel>
@@ -195,13 +210,13 @@ Checkbox.propTypes = {
   ])).isRequired,
 };
 
-ProductForm.propTypes = {
+ModelForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   categories: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
 };
 
-ProductForm.defaultProps = {
+ModelForm.defaultProps = {
 };
 
 TextAreaInput.propTypes = {
@@ -212,4 +227,4 @@ TextAreaInput.propTypes = {
   ])).isRequired,
 };
 
-export default reduxForm({ form: 'modelsForm' })(ProductForm);
+export default reduxForm({ form: 'modelsForm' })(ModelForm);

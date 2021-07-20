@@ -173,11 +173,13 @@ const renderSizesField = ({ fields, setStocksToDelete }) => (
           <InputLabel>
             Quantidade
           </InputLabel>
-          <Field
-            component={TextInput}
-            name={`${newSize}.quantity`}
-            style={{ marginLeft: '1em' }}
-          />
+          <div>
+            <Field
+              component={TextInput}
+              name={`${newSize}.quantity`}
+              style={{ marginLeft: '1em' }}
+            />
+          </div>
         </div>
         <Button
           close
