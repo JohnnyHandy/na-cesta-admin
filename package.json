@@ -35,7 +35,7 @@
     "start": "react-scripts start",
     "start:dev": "PORT=8000 REACT_APP_SERVER_ENV=dev react-scripts start",
     "start:production": "PORT=8000 REACT_APP_SERVER_ENV=production react-scripts start",
-    "build": "react-scripts build",
+    "build": "REACT_APP_SERVER_ENV=production react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
