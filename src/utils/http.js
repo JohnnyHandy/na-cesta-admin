@@ -1,15 +1,15 @@
 import axios from 'axios';
 
 const {
-  REACT_APP_SERVER_ENV = 'local',
+  REACT_APP_SERVER_ENV = 'dev',
   REACT_APP_SERVER_PORT = 3000,
 } = process.env;
 
 const backendHost = {
-  production: 'http://sharpen.fractaltec.io',
-  staging: 'http://sharpen-stag.fractaltec.io',
+  production: 'https://na-cesta-api.herokuapp.com/',
+  staging: '',
   development: '',
-  local: `http://localhost:${REACT_APP_SERVER_PORT}`,
+  dev: `http://localhost:${REACT_APP_SERVER_PORT}`,
   demo: '',
 };
 
