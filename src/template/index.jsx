@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 import { AiOutlineBlock, AiOutlineInbox } from 'react-icons/ai';
 
 import Logo from '../assets/na-cesta-logo.png';
-import { SIGN_OUT_SUCCESS } from '../store/auth';
+import { SIGN_OUT_REQUEST } from '../store/auth';
 
 const Container = styled('div')`
   background-color: burlywood;
@@ -67,7 +67,7 @@ const Template = ({ children }) => {
           style={{
             position: 'absolute', right: '1em', top: '1em', zIndex: '1',
           }}
-          onClick={() => dispatch(SIGN_OUT_SUCCESS())}
+          onClick={() => dispatch(SIGN_OUT_REQUEST({ history }))}
         >
           Logout
         </Button>

@@ -28,7 +28,8 @@ export function* signIn({ payload }) {
   }
 }
 
-export function* signOut() {
+export function* signOut({ payload }) {
+  const { history } = payload;
   try {
     const response = yield call(services.signOut);
     if (response.status === 200) {
@@ -38,6 +39,7 @@ export function* signOut() {
         autoDismiss: 1,
       }));
       yield put(actions.SIGN_OUT_SUCCESS());
+      history.push('/');
     }
   } catch (err) {
     yield put(error({
