@@ -27,7 +27,11 @@ const FormContainer = (props) => {
     await getCategories();
   }, []);
   const onSubmit = (data) => {
-    dispatch(createModelRequest({ data, resetForm }));
+    const parsedData = {
+      ...data,
+      team: data.team && data.team * 1,
+    };
+    dispatch(createModelRequest({ data: parsedData, resetForm }));
   };
   return (
     <FormComponent

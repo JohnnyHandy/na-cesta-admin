@@ -90,7 +90,7 @@ const OrderDetails = ({ order }) => {
         <DetailsSpan>
           Status:
           {orderInfo.status
-        && StatusOptions.find((statusItem) => statusItem.value === orderInfo.status).label}
+        && StatusOptions.find((statusItem) => statusItem.value === orderInfo.status)?.label}
         </DetailsSpan>
       </div>
       <div

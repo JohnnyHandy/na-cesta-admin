@@ -37,7 +37,11 @@ const FormContainer = (props) => {
     await getModelData();
   }, []);
   const onSubmit = (data) => {
-    dispatch(editModelRequest({ data, resetForm }));
+    const parsedData = {
+      ...data,
+      team: data.team && data.team * 1,
+    };
+    dispatch(editModelRequest({ data: parsedData, resetForm }));
   };
   if (!ready) {
     return <Loading />;
