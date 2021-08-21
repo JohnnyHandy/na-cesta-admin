@@ -39,8 +39,8 @@ const StyledIconButton = styled(Button)`
   padding: 0.2em;
 `;
 
-const fetchModelProducts = (id) => (
-  http.get(`/models/${id}/products`)
+const fetchModelProducts = (ref) => (
+  http.get(`/models/${ref}/products`)
 );
 
 const ProductsList = ({
@@ -50,18 +50,32 @@ const ProductsList = ({
   const history = useHistory();
   const [products, setProducts] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
-  const fetchProducts = async (id) => {
+  const fetchProducts = async (ref) => {
     setLoading(true);
-    await fetchModelProducts(id).then((response) => {
+    await fetchModelProducts(ref).then((response) => {
       if (response.status === 200) {
-        dispatch(updateCredentialsRequest(response.headers));
-        setProducts(response.data);
+        const { data: { data }, headers } = response;
+        const parsedData = data.map(({ attributes, id }) => ({
+          ...attributes,
+          id,
+          images: attributes?.images && attributes?.images.sort((a, b) => {
+            if (a.filename.charAt(0) < b.filename.charAt(0)) {
+              return -1;
+            }
+            if (a.filename.charAt(0) > b.filename.charAt(0)) {
+              return 1;
+            }
+            return 0;
+          }),
+        }));
+        dispatch(updateCredentialsRequest(headers));
+        setProducts(parsedData);
         setLoading(false);
       }
     });
   };
   React.useEffect(async () => {
-    if (model) {
+    if (model.id) {
       await fetchProducts(model.id);
     }
   }, [model]);
@@ -140,7 +154,7 @@ const ProductsList = ({
 
         </div>
         <div>
-          {products && products.length !== 0 && (
+          {model && (
           <StyledButton
             onClick={() => history.push(`/models/edit/${model.id}`)}
             color="warning"
@@ -209,14 +223,14 @@ const ProductsList = ({
             </span>
             <ProductDetailsWrapper>
               {
-                product.image_url && product.image_url.length && (
+                product.images && product.images[0] && (
                   <div css={css`grid-row: 1/-1`}>
                     <img
                       css={css`
                         height: 50%;
                         width: 50%;
                       `}
-                      src={product.image_url[0].url}
+                      src={product.images[0].url}
                       alt={product.name}
                     />
                   </div>

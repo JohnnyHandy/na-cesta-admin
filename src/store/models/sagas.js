@@ -22,8 +22,13 @@ export function* fetchModels({ payload }) {
     };
     const response = yield call(services.fetchModels, { queryParams });
     if (response.status === 200) {
-      yield put(updateCredentialsRequest(response.headers));
-      yield put(actions.fetchModelsSuccess(response.data));
+      const { data: { data }, headers } = response;
+      const parsedData = data.map(({ attributes, id }) => ({
+        ...attributes,
+        id,
+      }));
+      yield put(updateCredentialsRequest(headers));
+      yield put(actions.fetchModelsSuccess(parsedData));
     }
   } catch (err) {
     yield put(actions.fetchModelsFailure());
@@ -35,10 +40,13 @@ export function* createModel({ payload }) {
     const { resetForm, data } = payload;
     const ref = generateId(10);
     const params = {
-      model: {
-        ...data,
-        category_id: data.category_id * 1,
-        ref,
+      data: {
+        type: 'models',
+        attributes: {
+          ...data,
+          category_id: data.category_id * 1,
+          ref,
+        },
       },
     };
     const response = yield call(services.createModel, { ...params });
@@ -66,11 +74,17 @@ export function* createModel({ payload }) {
 
 export function* editModel({ payload }) {
   try {
-    const { data, resetForm } = payload;
+    const { data: { id, ...rest }, resetForm } = payload;
     const params = {
-      ...data,
+      data: {
+        type: 'models',
+        id,
+        attributes: {
+          ...rest,
+        },
+      },
     };
-    const response = yield call(services.updateModel, { data: params, id: data.id });
+    const response = yield call(services.updateModel, { data: params, id });
     if (response.status === 200) {
       yield put(success({
         title: 'Edição de Modelo',

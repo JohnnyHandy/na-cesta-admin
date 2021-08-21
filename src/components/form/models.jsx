@@ -39,7 +39,7 @@ const Input = styled('input')`
 const TextInput = ({ input, ...rest }) => (
   <Input {...rest} {...input} size="sm" type="text" />
 );
-const Checkbox = ({ input }) => <Input {...input} type="checkbox" />;
+const Checkbox = ({ input }) => <Input checked={input.value} {...input} type="checkbox" />;
 
 const TextArea = styled('textarea')`
 `;

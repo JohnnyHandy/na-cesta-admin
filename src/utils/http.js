@@ -16,8 +16,8 @@ const backendHost = {
 const instance = axios.create({
   baseURL: backendHost[REACT_APP_SERVER_ENV],
   headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+    'Content-Type': 'application/vnd.api+json',
+    Accept: 'application/vnd.api+json',
   },
 });
 

@@ -16,7 +16,7 @@ import {
   Button,
 } from 'reactstrap';
 
-import UploadComponent from '../crop/index';
+import UploadComponent from '../upload/index';
 
 const FormSection = styled(Form)`
   background: white;

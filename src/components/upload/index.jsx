@@ -99,7 +99,7 @@ export default function UploadCrop(props) {
             }),
           );
         } else {
-          const newImageOrder = fields.getAll() ? fields.getAll().length + 1 : 1;
+          const newImageOrder = fields.getAll() ? fields.getAll().length : 1;
           fields.push({
             file,
             filename: `${newImageOrder}-${file.name}`,

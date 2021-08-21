@@ -19,6 +19,7 @@ const FormContainer = (props) => {
   const [imagesToDelete, setImagesToDelete] = React.useState([]);
   const [stocksToDelete, setStocksToDelete] = React.useState([]);
   const [initialValues, setInitialValues] = React.useState({});
+  const [nullValues, setNullValues] = React.useState([]);
   const [ready, setRenderReady] = React.useState(false);
   const modelsItems = useSelector((state) => state.models.items);
   const resetForm = () => history.push('/');
@@ -27,10 +28,11 @@ const FormContainer = (props) => {
     await fetchProductData(id).then((res) => {
       if (res.status === 200) {
         dispatch(updateCredentialsRequest(res.headers));
-        const { data: { image_url, stocks, ...rest } } = res;
+        const { data: { data: { attributes: { images, stocks, ...rest } } } } = res;
         const productInfo = {
           ...rest,
-          images: image_url.map((item) => ({
+          id,
+          images: images.map((item) => ({
             ...item,
             stored: true,
           })),
@@ -91,6 +93,8 @@ const FormContainer = (props) => {
       setImagesToDelete={setImagesToDelete}
       setStocksToDelete={setStocksToDelete}
       initialValues={initialValues}
+      setNullValues={setNullValues}
+      nullValues={nullValues}
       onSubmit={onSubmit}
       dispatch={dispatch}
       {...props}
