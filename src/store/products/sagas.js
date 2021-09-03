@@ -72,20 +72,20 @@ export function* createProduct({ payload }) {
     const { data, resetForm } = payload;
     const formData = new FormData();
     Object.keys(data).filter((item) => (item !== 'images' && item !== 'stocks_attributes')).forEach((attr) => {
-      formData.append(`${attr}`, data[attr]);
+      formData.append(`data[attributes][${attr}]`, data[attr]);
     });
     if (data.images && data.images.length) {
       data.images.forEach((image) => {
         const { file } = image;
         const editedFile = new File([file], image.filename, { type: image.content_type });
 
-        formData.append('images[]', editedFile);
+        formData.append('data[attributes][images][]', editedFile);
       });
     }
     if (data.stocks_attributes && data.stocks_attributes.length) {
       data.stocks_attributes.forEach((item, index) => {
-        formData.append(`stocks_attributes[${index}][size]`, item.size);
-        formData.append(`stocks_attributes[${index}][quantity]`, item.quantity);
+        formData.append(`data[attributes][stocks_attributes][${index}][size]`, item.size);
+        formData.append(`data[attributes][stocks_attributes][${index}][quantity]`, item.quantity);
       });
     }
     const response = yield call(services.createProduct, { data: formData });
@@ -129,25 +129,25 @@ export function* editProduct({ payload }) {
     }
     const formData = new FormData();
     Object.keys(data).filter((item) => (item !== 'images' && item !== 'model_id' && item !== 'id' && item !== 'stocks_attributes')).forEach((attr) => {
-      formData.append(`${attr}`, data[attr]);
+      formData.append(`data[attributes][${attr}]`, data[attr]);
     });
     if (data.images && data.images.length) {
       data.images.forEach((image) => {
         const { file } = image;
         const editedFile = new File([file], image.filename, { type: image.content_type });
 
-        formData.append('images[]', editedFile);
+        formData.append('data[attributes][images][]', editedFile);
       });
     }
     if (data.stocks_attributes && data.stocks_attributes.length) {
       data.stocks_attributes.forEach((item, index) => {
-        formData.append(`stocks_attributes[${index}][id]`, item.id);
-        formData.append(`stocks_attributes[${index}][size]`, item.size);
-        formData.append(`stocks_attributes[${index}][quantity]`, item.quantity);
+        formData.append(`data[attributes][stocks_attributes][${index}][id]`, item.id);
+        formData.append(`data[attributes][stocks_attributes][${index}][size]`, item.size);
+        formData.append(`data[attributes][stocks_attributes][${index}][quantity]`, item.quantity);
       });
     }
     const response = yield call(services.editProduct, { productId: data.id, data: formData });
-    if (response.status === 200) {
+    if (response.status === 201) {
       yield put(success({
         title: 'Edição de Produto',
         message: 'Sucesso!',
@@ -200,7 +200,12 @@ export function* updateImagesOrder({ payload }) {
     ).map(
       ({ newParams: { newFilename, productId }, id }) => {
         const params = {
-          filename: newFilename,
+          data: {
+            type: 'images',
+            attributes: {
+              filename: newFilename,
+            },
+          },
         };
         const response = call(
           services.updateImage, { imageId: id, productId, params },

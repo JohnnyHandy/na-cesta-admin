@@ -9,9 +9,14 @@ export function* fetchOrders() {
   try {
     const response = yield call(services.fetchOrders);
     if (response.status === 200) {
-      const { data } = response;
-      yield put(updateCredentialsRequest(response.headers));
-      yield put(actions.fetchOrdersSuccess(data));
+      const { data: { data }, headers } = response;
+      const parsedData = data.map(({ attributes, id }) => ({
+        ...attributes,
+        id,
+      }));
+
+      yield put(updateCredentialsRequest(headers));
+      yield put(actions.fetchOrdersSuccess(parsedData));
     }
   } catch (e) {
     yield put(actions.fetchOrdersError(e));

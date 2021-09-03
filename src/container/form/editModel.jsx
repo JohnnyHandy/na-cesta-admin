@@ -8,6 +8,8 @@ import Loading from '../../components/loading';
 import { editModelRequest } from '../../store/models';
 import { updateCredentialsRequest } from '../../store/auth';
 
+import { nbaTeams } from '../../utils/constants';
+
 const FormContainer = (props) => {
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -19,17 +21,25 @@ const FormContainer = (props) => {
   React.useEffect(async () => {
     const getCategories = async () => http.get('/categories').then((res) => {
       if (res.status === 200) {
-        dispatch(updateCredentialsRequest(res.headers));
-        setCategories(res.data.map((item) => ({
-          name: item.name,
-          value: item.id,
-        })));
+        const { data: { data }, headers } = res;
+        const parsedData = data.map(({ attributes, id: categoryId }) => ({
+          name: attributes.name,
+          value: categoryId,
+        }));
+        dispatch(updateCredentialsRequest(headers));
+        setCategories(parsedData);
       }
     });
     const getModelData = async () => http.get(`/models/${id}`).then((res) => {
       if (res.status === 200) {
-        dispatch(updateCredentialsRequest(res.headers));
-        setInitialValues(res.data);
+        const { data: { data: { attributes } }, headers } = res;
+        const parsedData = {
+          ...attributes,
+          id,
+          team: nbaTeams[Object.keys(nbaTeams).find((item) => item === attributes.team)],
+        };
+        dispatch(updateCredentialsRequest(headers));
+        setInitialValues(parsedData);
         setRenderReady(true);
       }
     });
@@ -40,6 +50,8 @@ const FormContainer = (props) => {
     const parsedData = {
       ...data,
       team: data.team && data.team * 1,
+      is_deal: data.is_deal ? data.is_deal : false,
+      enabled: data.enabled ? data.enabled : false,
     };
     dispatch(editModelRequest({ data: parsedData, resetForm }));
   };

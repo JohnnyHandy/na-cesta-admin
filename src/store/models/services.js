@@ -7,6 +7,6 @@ export const fetchModels = ({ queryParams }) => http.get(modelUrls, { params: qu
 
 export const createModel = (attributes) => http.post(modelUrls, attributes);
 
-export const updateModel = ({ data, id }) => http.put(`${modelUrls}/${id}`, data);
+export const updateModel = ({ data, id }) => http.patch(`${modelUrls}/${id}`, data);
 
 export const deleteModel = ({ data, id }) => http.delete(`${modelUrls}/${id}`, { data });

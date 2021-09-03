@@ -6,6 +6,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import FormComponent from '../../components/form/products';
 import { createProductRequest } from '../../store/products';
 import { fetchModelsRequest } from '../../store/models';
+import { generateId } from '../../utils/functions';
 
 const FormContainer = () => {
   const [nullValues, setNullValues] = React.useState([]);
@@ -23,6 +24,7 @@ const FormContainer = () => {
         ...data,
         is_deal: data.is_deal ? data.is_deal : false,
         enabled: data.enabled ? data.enabled : false,
+        ref: generateId(10),
       },
       resetForm,
     };

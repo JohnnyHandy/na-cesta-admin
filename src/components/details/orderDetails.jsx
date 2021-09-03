@@ -38,8 +38,13 @@ const OrderDetails = ({ order }) => {
     setLoading(true);
     await fetchOrderDetails(id).then((response) => {
       if (response.status === 200) {
-        dispatch(updateCredentialsRequest(response.headers));
-        setOrderInfo(response.data);
+        const { data: { data: { attributes } }, headers } = response;
+        const parsedData = ({
+          ...attributes,
+          id,
+        });
+        dispatch(updateCredentialsRequest(headers));
+        setOrderInfo(parsedData);
         setLoading(false);
       }
     });

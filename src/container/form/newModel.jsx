@@ -17,11 +17,13 @@ const FormContainer = (props) => {
     fetchModelsRequest();
     const getCategories = async () => http.get('/categories').then((res) => {
       if (res.status === 200) {
-        dispatch(updateCredentialsRequest(res.headers));
-        setCategories(res.data.map((item) => ({
-          name: item.name,
-          value: item.id,
-        })));
+        const { data: { data }, headers } = res;
+        const parsedData = data.map(({ attributes, id }) => ({
+          name: attributes.name,
+          value: id,
+        }));
+        dispatch(updateCredentialsRequest(headers));
+        setCategories(parsedData);
       }
     });
     await getCategories();
@@ -30,6 +32,8 @@ const FormContainer = (props) => {
     const parsedData = {
       ...data,
       team: data.team && data.team * 1,
+      is_deal: data.is_deal ? data.is_deal : false,
+      enabled: data.enabled ? data.enabled : false,
     };
     dispatch(createModelRequest({ data: parsedData, resetForm }));
   };
