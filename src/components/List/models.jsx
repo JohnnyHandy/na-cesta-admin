@@ -66,7 +66,7 @@ const List = ({
 }) => {
   const history = useHistory();
   const [categories, setCategories] = React.useState([]);
-  const [team, setTeam] = React.useState();
+  const [team, setTeam] = React.useState('');
   React.useEffect(() => {
     dispatch(fetchModelsRequest());
   }, [dispatch]);
